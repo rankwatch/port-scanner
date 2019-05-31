@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Logged Out!{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="alert alert-danger">
+    <strong>Logged out!</strong> Please <a href="{% url 'login' %}">Login</a> to continue!
+    </div>
+</div>
+{% endblock %}
