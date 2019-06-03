@@ -4,7 +4,7 @@ from celery.signals import worker_process_init
 from multiprocessing import current_process
 from django.shortcuts import render
 from random import randint
-from port_scanner import MultiScan
+from py_port_scan import MultiScan
 
 
 @app.task
