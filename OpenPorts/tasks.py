@@ -21,6 +21,6 @@ def scanOpenPorts(ips, ports, threads, timeout, username, password):
     res["ports"] = str((ports[1] - ports[0])*len(ips))
 
     user_id = str(username) + str(password)
-    # print(user_id)
+
     scan = Scan(user_id=user_id, data=str(res))
     scan.save()
