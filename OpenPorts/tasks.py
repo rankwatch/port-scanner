@@ -4,19 +4,7 @@ from celery.signals import worker_process_init
 from multiprocessing import current_process
 from django.shortcuts import render
 from random import randint
-import sys
-
-
-sys.path.insert(0, "/media/root/Elements/Kali/Programs/Libs/py-port-scan/PortScanner/")
 from port_scanner import MultiScan
-
-
-# @worker_process_init.connect
-# def fix_multiprocessing(**kwargs):
-#     try:
-#         current_process()._config
-#     except AttributeError:
-#         current_process()._config = {'semprefix': '/mp'}
 
 
 @app.task
