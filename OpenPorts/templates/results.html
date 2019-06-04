@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Results</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="jumbotron jumbotron-fluid bg-warning text-center" id="scanned">
+  <br><br>
+  <h1 class="font-weight-bolder">Scan Finished!</h1>
+  <p>Detailed results of the complete scan</p>
+  <p>The Scan finished in <span class="font-weight-bold">{{total_runtime}}</span> seconds</p>
+</div>
+
+<div class="container">
+    <div class="card-columns">
+        {% for ip, values in ips.items %}
+            <div class="card text-center bg-primary text-white">
+                <div class="card-body">
+                    <h2 class="font-weight-bolder">{{ip}}</h2>
+                    <h6 class="text-left font-weight-bold">Open Ports</h6>
+                    {% for k, v in values.items %}
+                        {% if k == "Number of Open Ports" %}
+                            {% if v == 0 %}
+                                <ul class="list-group text-white text-left">
+                                    <li class="list-group-item bg-success">No Open Ports!</li>
+                                </ul>
+                            {% endif %}
+                        {% endif %}
+                        {% if k == "Opened Ports" %}
+                            {% for i in v %}
+                                <ul class="list-group text-white text-left">
+                                    <li class="list-group-item bg-success">{{i}}</li>
+                                </ul>
+                            {% endfor %}                        
+                        {% endif %}
+                        {% if k == "Runtime" %}
+                            <div>
+                                <ul class="list-group text-white text-left">
+                                    <li class="list-group-item bg-danger">Runtime {{v}}s</li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+</body>
+</html>
