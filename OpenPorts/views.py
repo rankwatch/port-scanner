@@ -50,3 +50,23 @@ def view_scans(request):
         res[scan.scan_id] = ast.literal_eval(scan.data)
 
     return render(request, 'view_scans.html', {"scans": res})
+
+
+@login_required
+def addhost(request):
+    return render(request, "add_host_ip.html")
+
+
+@login_required
+def addnewhost(request):
+    print(request.GET.get('host_ip'))
+    print(request.GET.get('secure_ports'))
+    print(request.GET.get('open_ports'))
+    print(request.GET.get('secure_proxy'))
+    print(request.GET.get('unsecure_proxy'))
+
+
+    
+
+
+    return HttpResponse("Success")

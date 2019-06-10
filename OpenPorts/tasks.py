@@ -5,6 +5,9 @@ from multiprocessing import current_process
 from django.shortcuts import render
 from random import randint
 from py_port_scan import MultiScan
+from django.contrib.auth.models import User
+
+import jsonpickle as jp
 
 
 @app.task
@@ -20,7 +23,7 @@ def scanOpenPorts(ips, ports, threads, timeout, username, password):
     res["id"] = "".join([chr(randint(65, 65+25)) for x in range(20)])
     res["ports"] = str((ports[1] - ports[0])*len(ips))
 
-    user_id = str(username) + str(password)
+    user_id = User.objects.get(username=username)
 
     scan = Scan(user_id=user_id, data=str(res))
     scan.save()

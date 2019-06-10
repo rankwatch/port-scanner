@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Scan Ports</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <style>
+    a {
+      outline: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top">
+      <a class="navbar-brand" href="#">Menu</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="collapsibleNavbar">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'home' %}">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="javascript:loadResults()">Rescan</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="javascript:loadPrevResults()">Last Scan</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="javascript:viewAllResults()">View Scans</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+            </li>
+          </ul>
+      </div>  
+  </nav>
+
+<div class="jumbotron jumbotron-fluid bg-primary text-white text-center">
+    <br><br>
+    <h1 class="font-weight-bolder">Port Scanner</h1>
+    <p>Scan for open ports for the given IPs in the given port range</p>
+</div>
+
+<div class="container">
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="tab" href="#FullScan">Full Scan</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#ProxyScan">Proxy Scan</a>
+    </li>
+  </ul>
+  
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div id="FullScan" class="container tab-pane active"><br>
+      <div class="container">
+        <form class="needs-validation" novalidate>
+          <div class="form-group">
+            <label for="IPAddr">IP Address(es):</label>
+            <input type="text" class="form-control" id="IPAddr" placeholder="Enter IP Address(es)" name="IPAddr" required>
+            <div class="valid-feedback">Valid.</div>
+            <div class="invalid-feedback">Please fill out this field.</div>
+          </div>
+          <div class="form-group">
+            <label for="PortRange">Port Range:</label>
+            <input type="text" class="form-control" id="PortRange" placeholder="Enter Port Range" name="PortRange" required>
+            <div class="valid-feedback">Valid.</div>
+            <div class="invalid-feedback">Please fill out this field.</div>
+          </div>
+          <div class="form-group">
+            <label for="Threads">Threads:</label>
+            <input type="text" class="form-control" id="Threads" placeholder="Enter Number of Threads" name="Threads" value="100">
+            <div class="valid-feedback">Valid.</div>
+          </div>
+          <div class="form-group">
+            <label for="Timeout">Timeout:</label>
+            <input type="text" class="form-control" id="Timeout" placeholder="Enter Timeout" name="Timeout" value="3">
+            <div class="valid-feedback">Valid.</div>
+          </div>
+          <a id="submit" class="btn btn-primary" href="javascript:loadResults()">Scan</a>
+        </form>
+      </div>
+    </div>
+    
+    <div id="ProxyScan" class="container tab-pane fade"><br>
+      <div class="container">
+        <form class="needs-validation" novalidate method="GET">
+          <div class="form-group">
+            <label for="IPAddr">IP Address(es):</label>
+            <input type="text" class="form-control" id="IPAddr" placeholder="Enter IP Address(es)" name="IPAddr" required>
+            <div class="valid-feedback">Valid.</div>
+            <div class="invalid-feedback">Please fill out this field.</div>
+          </div>
+          <div class="form-group">
+            <label for="PortRange">Port Range:</label>
+            <input type="text" class="form-control" id="PortRange" placeholder="Enter Port Range" name="PortRange" required>
+            <div class="valid-feedback">Valid.</div>
+            <div class="invalid-feedback">Please fill out this field.</div>
+          </div>
+          <div class="form-group">
+            <label for="Threads">Threads:</label>
+            <input type="text" class="form-control" id="Threads" placeholder="Enter Number of Threads" name="Threads" value="100">
+            <div class="valid-feedback">Valid.</div>
+          </div>
+          <div class="form-group">
+            <label for="Timeout">Timeout:</label>
+            <input type="text" class="form-control" id="Timeout" placeholder="Enter Timeout" name="Timeout" value="3">
+            <div class="valid-feedback">Valid.</div>
+          </div>
+          <div class="form-group">
+            <label for="ProxyIPs">Proxy IPs:</label>
+            <input type="text" class="form-control" id="ProxyIPs" placeholder="Enter Proxy IPs" name="ProxyIPs" required>
+            <div class="valid-feedback">Valid.</div>
+            <div class="invalid-feedback">Please fill out this field.</div>
+          </div>
+          <div class="form-group">
+            <label for="ProxyPorts">Proxy Ports:</label>
+            <input type="text" class="form-control" id="ProxyPorts" placeholder="Enter Port Range" name="ProxyPorts" required>
+            <div class="valid-feedback">Valid.</div>
+            <div class="invalid-feedback">Please fill out this field.</div>
+          </div>
+          <a id="submit" class="btn btn-primary" href="javascript:loadProxyResults()">Scan</a>
+        </form>
+      </div>
+    </div>  
+  </div>
+</div>
+<br>
+<br>
+
+<div id="results">
+</div>
+
+<div class="container">
+  <div class="d-flex justify-content-center">
+      <div class="spinner-border text-primary" role="status" id="loadingmessage" style="display: none">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+    <br><br>
+</div>
+
+<script>
+
+$('.navbar-nav>li>a').on('click', function(){
+    $('.navbar-collapse').collapse('hide');
+});
+
+// Disable form submissions if there are invalid fields
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Get the forms we want to add validation styles to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+
+// Results function
+function loadResults() {
+  
+  $('#loadingmessage').show();
+
+  var IPAddr = document.getElementById('IPAddr').value;
+  var PortRange = document.getElementById('PortRange').value;
+  var Threads = document.getElementById('Threads').value;
+  var Timeout = document.getElementById('Timeout').value;
+  // var flag = document.getElementById('flag');
+
+  $.ajax({
+    type: "GET",
+    url: document.URL+"/scan",
+    data: {
+      'IPAddr': IPAddr,
+      'PortRange': PortRange,
+      'Threads': Threads,
+      'Timeout': Timeout,
+    },
+    dataType: 'json',
+    success: function (data) {
+      if(data) {
+        $('#loadingmessage').hide();
+        $('#results').html('<div class="container">\
+                            <div class="alert alert-success alert-dismissible">\
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                            <strong>Success!</strong> Scan Initiated!.\
+                            </div></div>')
+        $('html, body').animate({
+            scrollTop: $("#scanned").offset().top
+        }, 2000);
+      }
+    }
+  });
+};
+
+// Previous Results function
+function loadPrevResults() {
+  
+  $('#loadingmessage').show();
+
+  $.ajax({
+    type: "GET",
+    url: document.URL+"/fetch",
+    data: {},
+    dataType: 'html',
+    success: function (data) {
+      if(data) {
+        $('#loadingmessage').hide();
+        $("#results").html(data);
+        $('html, body').animate({
+            scrollTop: $("#scanned").offset().top
+        }, 2000);
+      }
+    }
+  });
+};
+
+// View All Results function
+function viewAllResults() {
+  
+  $('#loadingmessage').show();
+
+  $.ajax({
+    type: "GET",
+    url: document.URL+"/view_scans",
+    data: {},
+    dataType: 'html',
+    success: function (data) {
+      if(data) {
+        $('#loadingmessage').hide();
+        $("#results").html(data);
+        $('html, body').animate({
+            scrollTop: $("#scanned").offset().top
+        }, 2000);
+      }
+    }
+  });
+};
+
+</script>
+</body>
+</html>
