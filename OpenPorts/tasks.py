@@ -1,29 +1,86 @@
 from PortScanner.celery import app
-from .models import Scan
 from celery.signals import worker_process_init
+
+from .models import Host, SecuredPort, OpenPort
+from .models import SecurePortResult, OpenPortResult
+from .models import Settings
+
 from multiprocessing import current_process
-from django.shortcuts import render
 from random import randint
+from datetime import datetime
+
 from py_port_scan import MultiScan
+
+from django.shortcuts import render
 from django.contrib.auth.models import User
 
 import jsonpickle as jp
 
 
 @app.task
-def scanOpenPorts(ips, ports, threads, timeout, username, password):
+def scanOpenPorts(username):
 
-    res = {}
+    last_host = Host.objects.filter(
+        added_by=User.objects.get(username=username)).last()
+    last_open_ports = OpenPort.objects.filter(
+        added_by=User.objects.get(username=username)).last()
+    last_secured_ports = SecuredPort.objects.filter(
+        added_by=User.objects.get(username=username)).last()
+    last_settings = Settings.objects.filter(
+        user=User.objects.get(username=username)).last()
 
-    mulScan = MultiScan(targets=ips, ports=range(ports[0], ports[1]),
-                        threads=threads, timeout=timeout)
+    secure_proxy = last_host.secure_proxy_ip.split(":")[0]
+    secure_port = int(last_host.secure_proxy_ip.split(":")[1])
+    unsecure_proxy = last_host.unsecure_proxy_ip.split(":")[0]
+    unsecure_port = int(last_host.unsecure_proxy_ip.split(":")[1])
+    ports = [int(x.strip()) for x in last_open_ports.unsecured_ports.split(",")]
 
-    res["ips"] = dict(mulScan.run_full_scan())
-    res["total_runtime"] = round(mulScan.get_total_runtime(), 2)
-    res["id"] = "".join([chr(randint(65, 65+25)) for x in range(20)])
-    res["ports"] = str((ports[1] - ports[0])*len(ips))
+    mulScan = MultiScan(targets=[last_host.ip],
+                        ports=ports,
+                        threads=last_settings.threads,
+                        timeout=last_settings.timeout,
+                        proxy_ip=[secure_proxy, unsecure_proxy],
+                        proxy_port=[secure_port, unsecure_port])
 
-    user_id = User.objects.get(username=username)
+    secure_res = dict(mulScan.run_proxy_scan(True))
+    unsecure_res = dict(mulScan.run_proxy_scan(False))
 
-    scan = Scan(user_id=user_id, data=str(res))
-    scan.save()
+    secure_scan_res = SecurePortResult(
+        added_by=User.objects.get(username=username),
+        host=Host.objects.get(host_id=last_host.host_id),
+        open_ports=", ".join(secure_res[secure_proxy+"::"+last_host.ip]["Opened Ports"]),
+        closed_ports=", ".join(secure_res[secure_proxy+"::"+last_host.ip]["Closed Ports"]),
+        runtime=secure_res[secure_proxy+"::"+last_host.ip]["Runtime"])
+
+    secure_scan_res.save()
+
+
+@app.task
+def addHostToDB(username, hostip, hostname, provider,
+                secure_ports, open_ports,
+                secure_proxy, unsecure_proxy):
+
+    user = User.objects.get(username=username)
+    host = Host(ip=hostip, added_by=user, secure_proxy_ip=secure_proxy,
+                unsecure_proxy_ip=unsecure_proxy, added_on=datetime.now(),
+                modified_on=datetime.now(), host_name=hostname,
+                provider=provider)
+
+    host.save()
+
+    host_primary_key = Host.objects.filter(
+        ip=hostip,
+        added_by=User.objects.get(username=username)).last().host_id
+
+    sp = SecuredPort(added_by=user,
+                     host=Host.objects.get(host_id=host_primary_key),
+                     secured_ports=", ".join(secure_ports.split("::")[1:-1]))
+
+    up = OpenPort(added_by=user,
+                  host=Host.objects.get(host_id=host_primary_key),
+                  unsecured_ports=", ".join(open_ports.split("::")[1:-1]))
+
+    sp.save()
+    up.save()
+
+    scanOpenPorts(username)

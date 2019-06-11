@@ -6,8 +6,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from .models import Scan
-from .tasks import scanOpenPorts
+from .tasks import scanOpenPorts, addHostToDB
 
 import ast
 
@@ -22,7 +21,8 @@ def index(request):
 
     ips = list(map(lambda x: x.strip(), list(request.GET.get('IPAddr')
                                              .split(","))))
-    ports = list(map(int, request.GET.get('PortRange').split('-'))) if "-" in str(request.GET.get('PortRange')) else [0, int(request.GET.get('PortRange'))]
+    ports = list(map(int, request.GET.get('PortRange').split('-'))) if "-" in str(
+        request.GET.get('PortRange')) else [0, int(request.GET.get('PortRange'))]
     threads = int(request.GET.get('Threads'))
     timeout = int(request.GET.get('Timeout'))
 
@@ -59,14 +59,14 @@ def addhost(request):
 
 @login_required
 def addnewhost(request):
-    print(request.GET.get('host_ip'))
-    print(request.GET.get('secure_ports'))
-    print(request.GET.get('open_ports'))
-    print(request.GET.get('secure_proxy'))
-    print(request.GET.get('unsecure_proxy'))
 
-
-    
-
+    addHostToDB.delay(request.user.username,
+                      request.GET.get('host_ip'),
+                      request.GET.get('hostname'),
+                      request.GET.get('provider'),
+                      request.GET.get('secure_ports'),
+                      request.GET.get('open_ports'),
+                      request.GET.get('secure_proxy'),
+                      request.GET.get('unsecure_proxy'))
 
     return HttpResponse("Success")

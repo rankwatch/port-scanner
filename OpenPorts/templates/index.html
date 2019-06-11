@@ -5,13 +5,19 @@
   <title>Port Scanner</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"> -->
+  <link rel="stylesheet" href="https://bootswatch.com/4/slate/bootstrap.min.css">
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css"
     integrity="sha256-BJ/G+e+y7bQdrYkS2RBTyNfBHpA9IuGaPmf9htub5MQ=" crossorigin="anonymous" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <style>
+    a {
+      outline: 0;
+    }
+  </style>
 </head>
 
 <body>
@@ -41,13 +47,13 @@
       <div class="collapse navbar-collapse" id="collapsibleNavbar2">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <a class="nav-link text-primary" href="#"><span class="oi oi-dashboard"></span> View Dashboard</a>
+            <a class="nav-link text-warning" href="#"><span class="oi oi-dashboard"></span> View Dashboard</a>
           </li>
           <li class="nav-item">
             <a class="nav-link text-danger" href="#"><span class="oi oi-warning"></span> Alerts</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-primary" href="#"><span class="oi oi-document"></span> Report</a>
+            <a class="nav-link text-info" href="#"><span class="oi oi-document"></span> Report</a>
           </li>
           <li class="nav-item">
             <a class="nav-link text-success" href="javascript:loadAddHost()"><span class="oi oi-plus"></span> Add
@@ -65,6 +71,11 @@
 
 
   <script>
+
+    $('.navbar-nav>li>a').on('click', function () {
+      $('.navbar-collapse').collapse('hide');
+    });
+
     function loadAddHost() {
 
       $.ajax({
@@ -113,7 +124,7 @@
         if (value1 > 0 && value1 <= 65536) {
           // console.log(value1);
           var node = document.createElement("OPTION");
-          node.className = "list-group-item small";
+          node.className = "list-group-item text-white bg-dark small";
           node.appendChild(document.createTextNode(value1));
           document.getElementById("open_port_list").appendChild(node);
         }
@@ -134,7 +145,7 @@
         if (value1 > 0 && value1 <= 65536) {
           // console.log(value1);
           var node = document.createElement("OPTION");
-          node.className = "list-group-item small";
+          node.className = "list-group-item text-white bg-dark small";
           node.appendChild(document.createTextNode(value1));
           document.getElementById("secure_port_list").appendChild(node);
         }
@@ -160,6 +171,8 @@
     function saveData() {
 
       var hostip = document.getElementById("hostip").value;
+      var hostname = document.getElementById("hostname").value;
+      var provider = document.getElementById("provider").value;
       var secure_proxy = document.getElementById("secure_ip_text").value;
       var unsecure_proxy = document.getElementById("unsecure_ip_text").value;
       var secure_ports_list = document.getElementById("secure_port_list");
@@ -184,6 +197,8 @@
         url: document.URL + "/addnewhost",
         data: {
           'host_ip': hostip,
+          'hostname': hostname,
+          'provider': provider,
           'secure_ports': sp_string,
           'open_ports': op_string,
           'secure_proxy': secure_proxy,
