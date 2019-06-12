@@ -10,9 +10,7 @@
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css"
     integrity="sha256-BJ/G+e+y7bQdrYkS2RBTyNfBHpA9IuGaPmf9htub5MQ=" crossorigin="anonymous" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
   <style>
     a {
       outline: 0;
@@ -29,7 +27,7 @@
     <div class="collapse navbar-collapse" id="collapsibleNavbar1">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
-          <a class="nav-link" href="#"><span class="oi oi-cog"></span> Settings </a>
+          <a class="nav-link" href="javascript:loadSettings()"><span class="oi oi-cog"></span> Settings </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'logout' %}"><span class="oi oi-account-logout"></span> Log Out </a>
@@ -48,6 +46,10 @@
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
             <a class="nav-link text-warning" href="#"><span class="oi oi-dashboard"></span> View Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-info" href="javascript:loadAllHost()"><span class="oi oi-list"></span> View All
+              Hosts</a>
           </li>
           <li class="nav-item">
             <a class="nav-link text-danger" href="#"><span class="oi oi-warning"></span> Alerts</a>
@@ -69,6 +71,11 @@
 
   <div id="results" class="container col-sm-12" style="padding : 2%;"></div>
 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
 
   <script>
 
@@ -173,10 +180,18 @@
       var hostip = document.getElementById("hostip").value;
       var hostname = document.getElementById("hostname").value;
       var provider = document.getElementById("provider").value;
-      var secure_proxy = document.getElementById("secure_ip_text").value;
-      var unsecure_proxy = document.getElementById("unsecure_ip_text").value;
+      var secure_proxy = "";
+      var unsecure_proxy = "";
       var secure_ports_list = document.getElementById("secure_port_list");
       var open_port_list = document.getElementById("open_port_list");
+
+      if(secure_ip.checked) {
+        secure_proxy = document.getElementById("secure_ip_text").value;
+      }
+
+      if(unsecure_ip.checked) {
+        unsecure_proxy = document.getElementById("unsecure_ip_text").value;
+      }
 
       var sp_string = "";
       var op_string = "";
@@ -226,6 +241,171 @@
 
     };
 
+    function addNewSettings() {
+      var checkBox = document.getElementById("secure_ip_settings");
+      if (checkBox.checked == false) {
+        alert("Please Select the Secure IP")
+        return;
+      }
+      else {
+        var text1 = document.getElementById("secure_ip_text_settings").value;
+      }
+      var checkBox1 = document.getElementById("unsecure_ip_settings");
+      if (checkBox1.checked == false) {
+        alert("Please Select the Unsecure IP")
+        return;
+      }
+      else {
+        var text2 = document.getElementById("unsecure_ip_text_settings").value;
+      }
+      console.log(document.URL);
+
+      $.ajax({
+        type: "GET",
+        url: document.URL + "/new_setting/",
+        data: {
+          'secure_proxy': text1,
+          'unsecure_proxy': text2
+        },
+        dataType: 'html',
+        success: function (data) {
+          if (data) {
+            console.log(document.URL);
+            $("#results").html('<div class="container">\
+                <div class="alert alert-success alert-dismissible">\
+                <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                <strong>Success</strong> Settings saved.\
+                </div></div>');
+          }
+          else {
+            $("#results").html('<div class="container">\
+                <div class="alert alert-danger alert-dismissible">\
+                <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                <strong>Oops!</strong> Something went wrong!\
+                </div></div>');
+          }
+        }
+      });
+    };
+
+    function loadSettings() {
+
+      $.ajax({
+        type: "GET",
+        url: document.URL + "/add_settings/",
+        dataType: 'html',
+        success: function (data) {
+          if (data) {
+            console.log(document.URL);
+            $("#results").html(data);
+          }
+          else {
+            $("#results").html('<div class="container">\
+                <div class="alert alert-danger alert-dismissible">\
+                <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                <strong>Oops!</strong> Something went wrong!\
+                </div></div>');
+          }
+        }
+      });
+    };
+
+    function myFunctionSettings() {
+      var checkBox = document.getElementById("secure_ip_settings");
+      var text = document.getElementById("secure_ip_text_settings");
+      if (checkBox.checked == true) {
+        text.disabled = false;
+      } else {
+        text.disabled = true;
+      }
+    };
+
+    function myFunctionSettings1() {
+      var checkBox = document.getElementById("unsecure_ip_settings");
+      var text = document.getElementById("unsecure_ip_text_settings");
+      if (checkBox.checked == true) {
+        text.disabled = false;
+      } else {
+        text.disabled = true;
+      }
+    };
+
+    function inaccessible() {
+      var checkBox = document.getElementById("inaccessible");
+      var text = document.getElementById("inaccessible_text");
+      var select_box = document.getElementById("inaccessible_select")
+      if (checkBox.checked == true) {
+        text.disabled = false;
+        select_box.disabled = false;
+      } else {
+        text.disabled = true;
+        select_box.disabled = true;
+      }
+    };
+
+    function insecure() {
+      var checkBox = document.getElementById("insecure");
+      var text = document.getElementById("insecure_text");
+      var select_box = document.getElementById("insecure_select")
+      if (checkBox.checked == true) {
+        text.disabled = false;
+        select_box.disabled = false;
+      } else {
+        text.disabled = true;
+        select_box.disabled = true;
+      }
+    };
+
+    function secure() {
+      var checkBox = document.getElementById("secure");
+      var text = document.getElementById("secure_text");
+      var select_box = document.getElementById("secure_select")
+      if (checkBox.checked == true) {
+        text.disabled = false;
+        select_box.disabled = false;
+      } else {
+        text.disabled = true;
+        select_box.disabled = true;
+      }
+    };
+
+    function accessible() {
+      var checkBox = document.getElementById("accessible");
+      var text = document.getElementById("accessible_text");
+      var select_box = document.getElementById("accessible_select")
+      if (checkBox.checked == true) {
+        text.disabled = false;
+        select_box.disabled = false;
+      } else {
+        text.disabled = true;
+        select_box.disabled = true;
+      }
+    };
+
+    $(document).ready(function () {
+      var table = $('#all_host_table').DataTable({ scrollX: true });
+    });
+
+    function loadAllHost() {
+
+      $.ajax({
+        type: "GET",
+        url: document.URL + "/allhosts/",
+        dataType: 'html',
+        success: function (data) {
+          if (data) {
+            console.log(document.URL);
+            $("#results").html(data);
+          } else {
+            $("#results").html('<div class="container">\
+                <div class="alert alert-danger alert-dismissible">\
+                <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                <strong>Oops!</strong> Something went wrong!\
+                </div></div>');
+          }
+        }
+      });
+    };
   </script>
 </body>
 

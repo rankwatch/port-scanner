@@ -7,5 +7,8 @@ urlpatterns = [
     url(r'^home/fetch', views.fetch, name='fetch'),
     url(r'^home/view_scans', views.view_scans, name='view_scans'),
     url(r'^home/addhost', views.addhost, name="addhost"),
-    url(r'^home/addnewhost', views.addnewhost, name="addnewhost")
+    url(r'^home/addnewhost', views.addnewhost, name="addnewhost"),
+    url(r'^home/add_settings', views.add_settings, name="add_settings"),
+    url(r'^home/new_settings', views.new_settings, name="new_settings"),
+    url(r'^home/allhosts', views.allhosts, name="allhosts")
 ]

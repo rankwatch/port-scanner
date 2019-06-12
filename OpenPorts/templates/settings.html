@@ -11,58 +11,81 @@
 </head>
 
 <body>
-  <div class="container col-sm-10 d-flex justify-content-center">
-    <div class="card  bg-light col-sm-7" style="padding: 3%;">
-      <div class="card-title oi oi-cog ">
-        Settings
-      </div>
+  <div class="container col-sm-12 d-flex justify-content-center">
+    <div class="card  bg-dark col-sm-7">
       <div class="card-body">
         {% if result %}
-        <div class="row small">
-          <div class="col-sm-5">
-            <input type="checkbox" id="secure_ip_settings" onclick="myFunctionSettings()" checked>&nbsp;&nbsp;Specify
-            Secured
-            Proxy IP:
-          </div>
-          <div class="col-sm-7">
-            <input type="text" class="form-control h-75" id="secure_ip_text_settings" placeholder="255.255.255.255:5000"
-              value={{result.Secure}}>
-          </div>
-        </div>
-        <div class="row small">
-          <div class="col-sm-5">
-            <input type="checkbox" id="unsecure_ip_settings" onclick="myFunctionSettings1()" checked>&nbsp;&nbsp;Specify
-            Unsecured Proxy IP:
-          </div>
-          <div class="col-sm-7">
-            <input type="text" class="form-control h-75" id="unsecure_ip_text_settings"
-              placeholder="255.255.255.255:5000" value={{result.unsecure}}>
-          </div>
-        </div>
-        <button id="save" class="btn btn-primary d-flex justify-content-center" onclick="addNewSettings()">Update
-          Settings</button> {% else %}
-        <div class="row small">
-          <div class="col-sm-5">
-            <input type="checkbox" id="secure_ip_settings" onclick="myFunctionSettings()">&nbsp;&nbsp;Specify Secured
-            Proxy IP:
-          </div>
-          <div class="col-sm-7">
-            <input type="text" class="form-control h-75" id="secure_ip_text_settings" placeholder="255.255.255.255:5000"
-              disabled="true">
-          </div>
-        </div>
-        <div class="row small">
-          <div class="col-sm-5">
-            <input type="checkbox" id="unsecure_ip_settings" onclick="myFunctionSettings1()">&nbsp;&nbsp;Specify
-            Unsecured Proxy IP:
-          </div>
-          <div class="col-sm-7">
-            <input type="text" class="form-control h-75" id="unsecure_ip_text_settings"
-              placeholder="255.255.255.255:5000" disabled="true">
-          </div>
-        </div>
-        <button id="save" class="btn btn-primary d-flex justify-content-center" onclick="addNewSettings()">Save
-          Settings</button>
+        <form>
+          <fieldset>
+            <legend class="text-center lead">Configure</legend>
+            <div class="form-group row">
+              <label for="secure_ip_text_settings" class="custom-control custom-checkbox">
+                <input type="checkbox" id="secure_ip_settings" class="custom-control-input"
+                  onclick="myFunctionSettings()" checked>
+                <label for="secure_ip_settings" class="custom-control-label">Specify Secured Proxy IP:</label>
+              </label>
+              <input type="text" class="form-control" id="secure_ip_text_settings" placeholder="255.255.255.255:5000"
+                value={{result.Secure}}>
+            </div>
+            <div class="form-group row">
+              <label for="unsecure_ip_text_settings" class="custom-control custom-checkbox">
+                <input type="checkbox" id="unsecure_ip_settings" class="custom-control-input"
+                  onclick="myFunctionSettings1()" checked>
+                <label for="unsecure_ip_settings" class="custom-control-label">Specify Unsecured Proxy IP:</label>
+              </label>
+              <input type="text" class="form-control" id="unsecure_ip_text_settings" placeholder="255.255.255.255:5000"
+                value={{result.Unsecure}}>
+            </div>
+            <div class="form-group row">
+              <label for="threads">Threads</label>
+              <input id="threads" type="text" class="form-control" value={{result.threads}}>
+            </div>
+            <div class="form-group row">
+              <label for="timeout">Timeout</label>
+              <input id="timeout" type="text" class="form-control" value={{result.timeout}}>
+            </div>
+            <div class="form-group row">
+              <button id="save" class="form-control btn btn-primary btn-block" onclick="addNewSettings()">Update
+                Settings</button>
+            </div>
+          </fieldset>
+        </form>
+        {% else %}
+        <form>
+          <fieldset>
+            <legend class="text-center lead">Configure</legend>
+            <div class="form-group row">
+              <label for="secure_ip_text_settings" class="custom-control custom-checkbox">
+                <input type="checkbox" id="secure_ip_settings" class="custom-control-input"
+                  onclick="myFunctionSettings()">
+                <label for="secure_ip_settings" class="custom-control-label">Specify Secured Proxy IP:</label>
+              </label>
+              <input type="text" class="form-control" id="secure_ip_text_settings" placeholder="255.255.255.255:5000"
+                disabled>
+            </div>
+            <div class="form-group row">
+              <label for="unsecure_ip_text_settings" class="custom-control custom-checkbox">
+                <input type="checkbox" id="unsecure_ip_settings" class="custom-control-input"
+                  onclick="myFunctionSettings1()">
+                <label for="unsecure_ip_settings" class="custom-control-label">Specify Unsecured Proxy IP:</label>
+              </label>
+              <input type="text" class="form-control" id="unsecure_ip_text_settings" placeholder="255.255.255.255:5000"
+                disabled>
+            </div>
+            <div class="form-group row">
+              <label for="threads">Threads</label>
+              <input id="threads" type="text" class="form-control" value=100>
+            </div>
+            <div class="form-group row">
+              <label for="timeout">Timeout</label>
+              <input id="timeout" type="text" class="form-control" value=1>
+            </div>
+            <div class="form-group row">
+              <button id="save" class="form-control btn btn-primary btn-block" onclick="addNewSettings()">Update
+                Settings</button>
+            </div>
+          </fieldset>
+        </form>
         {% endif %}
       </div>
     </div>

@@ -18,7 +18,7 @@ import jsonpickle as jp
 
 
 @app.task
-def scanOpenPorts(username):
+def scanLastHost(username):
 
     last_host = Host.objects.filter(
         added_by=User.objects.get(username=username)).last()
@@ -33,26 +33,62 @@ def scanOpenPorts(username):
     secure_port = int(last_host.secure_proxy_ip.split(":")[1])
     unsecure_proxy = last_host.unsecure_proxy_ip.split(":")[0]
     unsecure_port = int(last_host.unsecure_proxy_ip.split(":")[1])
-    ports = [int(x.strip()) for x in last_open_ports.unsecured_ports.split(",")]
+    open_ports = [int(x.strip())
+                  for x in last_open_ports.unsecured_ports.split(",")]
 
-    mulScan = MultiScan(targets=[last_host.ip],
-                        ports=ports,
-                        threads=last_settings.threads,
-                        timeout=last_settings.timeout,
-                        proxy_ip=[secure_proxy, unsecure_proxy],
-                        proxy_port=[secure_port, unsecure_port])
+    mulScan_unsecuredPorts = MultiScan(targets=[last_host.ip],
+                                       ports=open_ports,
+                                       threads=last_settings.threads,
+                                       timeout=last_settings.timeout,
+                                       proxy_ip=[secure_proxy, unsecure_proxy],
+                                       proxy_port=[secure_port, unsecure_port])
 
-    secure_res = dict(mulScan.run_proxy_scan(True))
-    unsecure_res = dict(mulScan.run_proxy_scan(False))
-
-    secure_scan_res = SecurePortResult(
+    open_port_res = dict(mulScan_unsecuredPorts.run_proxy_scan(False))
+    print("Open=", open_port_res)
+    open_res_write = OpenPortResult(
         added_by=User.objects.get(username=username),
         host=Host.objects.get(host_id=last_host.host_id),
-        open_ports=", ".join(secure_res[secure_proxy+"::"+last_host.ip]["Opened Ports"]),
-        closed_ports=", ".join(secure_res[secure_proxy+"::"+last_host.ip]["Closed Ports"]),
-        runtime=secure_res[secure_proxy+"::"+last_host.ip]["Runtime"])
+        open_ports=", ".join(
+            [str(x) for x in open_port_res[unsecure_proxy+"::"+last_host.ip]["Opened Ports"]]),
+        closed_ports=", ".join(
+            [str(x) for x in open_port_res[unsecure_proxy+"::"+last_host.ip]["Closed Ports"]]),
+        runtime=open_port_res[secure_proxy+"::"+last_host.ip]["Runtime"]
+    )
 
-    secure_scan_res.save()
+    open_res_write.save()
+
+    secured_ports = [int(x.strip())
+                     for x in last_secured_ports.secured_ports.split(",")]
+    mulScan_securedPorts = MultiScan(targets=[last_host.ip],
+                                     ports=secured_ports,
+                                     threads=last_settings.threads,
+                                     timeout=last_settings.timeout,
+                                     proxy_ip=[secure_proxy, unsecure_proxy],
+                                     proxy_port=[secure_port, unsecure_port])
+
+    secure_port_res = dict(mulScan_securedPorts.run_proxy_scan(True))
+    unsecure_port_res = dict(mulScan_securedPorts.run_proxy_scan(False))
+    print("True=", secure_port_res)
+    print("False=", unsecure_port_res)
+
+    secure_res_write = SecurePortResult(
+        added_by=User.objects.get(username=username),
+        host=Host.objects.get(host_id=last_host.host_id),
+        secure_open_ports=", ".join(
+            [str(x) for x in secure_port_res[secure_proxy+"::"+last_host.ip]["Opened Ports"]]),
+        secure_closed_ports=", ".join(
+            [str(x) for x in secure_port_res[secure_proxy+"::"+last_host.ip]["Closed Ports"]]),
+        secure_scan_runtime=secure_port_res[secure_proxy +
+                                            "::"+last_host.ip]["Runtime"],
+        unsecure_open_ports=", ".join(
+            [str(x) for x in unsecure_port_res[unsecure_proxy+"::"+last_host.ip]["Opened Ports"]]),
+        unsecure_closed_ports=", ".join(
+            [str(x) for x in unsecure_port_res[unsecure_proxy+"::"+last_host.ip]["Closed Ports"]]),
+        unsecure_scan_runtime=unsecure_port_res[unsecure_proxy +
+                                                "::"+last_host.ip]["Runtime"]
+    )
+
+    secure_res_write.save()
 
 
 @app.task
@@ -83,4 +119,4 @@ def addHostToDB(username, hostip, hostname, provider,
     sp.save()
     up.save()
 
-    scanOpenPorts(username)
+    scanLastHost(username)

@@ -62,7 +62,7 @@ class Settings(models.Model):
 
     secure_proxy_ip = models.GenericIPAddressField()
     unsecure_proxy_ip = models.GenericIPAddressField()
-    
+
     secure_proxy_port = models.IntegerField()
     unsecure_proxy_port = models.IntegerField()
 
@@ -81,18 +81,22 @@ class SecurePortResult(models.Model):
     added_by = models.ForeignKey(User, on_delete=models.CASCADE)
     host = models.ForeignKey(Host, on_delete=models.CASCADE)
 
-    open_ports = models.CharField(max_length=330000)
-    closed_ports = models.CharField(max_length=330000)
+    secure_open_ports = models.CharField(max_length=330000)
+    secure_closed_ports = models.CharField(max_length=330000)
 
-    started_on = models.DateTimeField(default=datetime.now, blank=True)
+    unsecure_open_ports = models.CharField(max_length=330000)
+    unsecure_closed_ports = models.CharField(max_length=330000)
 
-    runtime = models.CharField(max_length=255)
+    scanned_on = models.DateTimeField(default=datetime.now, blank=True)
+
+    secure_scan_runtime = models.CharField(max_length=255)
+    unsecure_scan_runtime = models.CharField(max_length=255)
 
     def publish(self):
         self.save()
 
     def __str__(self):
-        return str(self.started_on) + " by " + str(self.added_by.username)
+        return str(self.scanned_on) + " by " + str(self.added_by.username)
 
 
 class OpenPortResult(models.Model):
@@ -103,7 +107,7 @@ class OpenPortResult(models.Model):
     open_ports = models.CharField(max_length=330000)
     closed_ports = models.CharField(max_length=330000)
 
-    started_on = models.DateTimeField(default=datetime.now, blank=True)
+    scanned_on = models.DateTimeField(default=datetime.now, blank=True)
 
     runtime = models.CharField(max_length=255)
 
@@ -111,4 +115,4 @@ class OpenPortResult(models.Model):
         self.save()
 
     def __str__(self):
-        return str(self.started_on) + " by " + str(self.added_by.username)
+        return str(self.scanned_on) + " by " + str(self.added_by.username)
