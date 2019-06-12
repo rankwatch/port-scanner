@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Sign Up</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css"
+        integrity="sha256-BJ/G+e+y7bQdrYkS2RBTyNfBHpA9IuGaPmf9htub5MQ=" crossorigin="anonymous" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top">
+        <a class="navbar-brand" href="#">Port Scanner</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar1">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar1">
+            <ul class="navbar-nav ml-auto">
+
+            </ul>
+        </div>
+    </nav>
+
+
+
+    <div class="container d-flex justify-content-center" style="margin-top: 15%;">
+        <div class="card  col-sm-5" style="padding: 5%;   outline: #000000 solid 2px; ">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <label for="username">User Name :</label>
+
+                    <div class="form-control text-center">
+                        {{form.username}}
+                    </div>
+                    <br>
+                    <label for="password">Password :</label>
+                    <div class="form-control text-center">
+                        {{form.password1}}
+                    </div>
+                    <br>
+                    <label for="password">Confirm Password :</label>
+
+                    <div class="form-control text-center ">
+                        {{form.password2}}
+                    </div>
+                    <br>
+                    <!-- {{ form.as_p }} -->
+                    <button type="submit" class="btn btn-primary form-control text-center"> Sign up</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>

@@ -26,18 +26,30 @@
               <legend class="text-center lead">Host Address</legend>
               <div class="form-group row">
                 <label for="hostip">IP</label>
+                {% if result.host_ip %}
+                <input type="text" class="form-control col-sm-12" name="hostip" id="hostip" value={{result.host_ip}}>
+                {% else %}
                 <input type="text" class="form-control col-sm-12" name="hostip" id="hostip">
+                {% endif %}
               </div>
             </fieldset>
             <fieldset>
               <legend class="text-center lead">Host Details</legend>
               <div class="form-group row">
                 <label for="hostname">Host Name</label>
+                {% if result.host_name %}
+                <input type="text" class="form-control col-sm-12" id="hostname" value={{result.host_name}}>
+                {% else %}
                 <input type="text" class="form-control col-sm-12" id="hostname">
+                {% endif %}
               </div>
               <div class="form-group row">
                 <label for="provider">Provider</label>
+                {% if result.provider %}
+                <input type="text" class="form-control col-sm-12" id="provider" value={{result.provider}}>
+                {% else %}
                 <input type="text" class="form-control col-sm-12" id="provider">
+                {% endif %}
               </div>
             </fieldset>
           </form>
@@ -52,12 +64,21 @@
             <fieldset>
               <legend class="text-center lead">Secured Proxy</legend>
               <div class="form-group row">
+                {% if result.secure_proxy_ip %}
+                <label for="secure_ip_text" class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="secure_ip" onclick="myFunction()" checked>
+                  <label for="secure_ip" class="custom-control-label">Specify Secured Proxy IP</label>
+                </label>
+                <input type="text" class="form-control col-sm-12" id="secure_ip_text" placeholder="192.x.x.x:port"
+                  value={{result.secure_proxy_ip}}>
+                {% else %}
                 <label for="secure_ip_text" class="custom-control custom-checkbox">
                   <input type="checkbox" class="custom-control-input" id="secure_ip" onclick="myFunction()">
                   <label for="secure_ip" class="custom-control-label">Specify Secured Proxy IP</label>
                 </label>
                 <input type="text" class="form-control col-sm-12" id="secure_ip_text" placeholder="192.x.x.x:port"
-                  disabled="true">
+                  disabled>
+                {% endif %}
               </div>
             </fieldset>
             <fieldset>
@@ -76,9 +97,18 @@
                 <button type="button" class="oi oi-minus btn btn-outline-danger" onclick="removeSecuredPort()"></button>
               </div>
               <div class="form-group row">
+                {% if result.secure_ports %}
+                <select id="secure_port_list" multiple class="form-control bg-dark">
+                  <option class="list-group-item text-white bg-dark" disabled>Secure Ports</option>
+                  {% for i in result.secure_ports %}
+                  <option class="list-group-item text-white bg-dark small">{{i}}</option>
+                  {% endfor %}
+                </select>
+                {% else %}
                 <select id="secure_port_list" multiple class="form-control bg-dark">
                   <option class="list-group-item text-white bg-dark" disabled>Secure Ports</option>
                 </select>
+                {% endif %}
               </div>
             </fieldset>
           </form>
@@ -90,12 +120,21 @@
             <fieldset>
               <legend class="text-center lead">Unsecured Proxy</legend>
               <div class="form-group row">
+                {% if result.unsecure_proxy_ip %}
+                <label for="unsecure_ip_text" class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="unsecure_ip" onclick="myFunction1()" checked>
+                  <label for="unsecure_ip" class="custom-control-label">Specify Unsecured Proxy IP</label>
+                </label>
+                <input type="text" class="form-control col-sm-12" id="unsecure_ip_text" placeholder="192.x.x.x:port"
+                  value={{result.unsecure_proxy_ip}}>
+                {% else %}
                 <label for="unsecure_ip_text" class="custom-control custom-checkbox">
                   <input type="checkbox" class="custom-control-input" id="unsecure_ip" onclick="myFunction1()">
                   <label for="unsecure_ip" class="custom-control-label">Specify Unsecured Proxy IP</label>
                 </label>
                 <input type="text" class="form-control col-sm-12" id="unsecure_ip_text" placeholder="192.x.x.x:port"
-                  disabled="true">
+                  disabled>
+                {% endif %}
               </div>
             </fieldset>
             <fieldset>
@@ -114,9 +153,18 @@
                 <button type="button" class="oi oi-minus btn btn-outline-danger" onclick="removeOpenPort()"></button>
               </div>
               <div class="form-group row">
+                {% if result.open_ports %}
+                <select id="open_port_list" multiple class="form-control bg-dark">
+                  <option class="list-group-item text-white bg-dark" disabled>Open Ports</option>
+                  {% for i in result.open_ports %}
+                  <option class="list-group-item text-white bg-dark small">{{i}}</option>
+                  {% endfor %}
+                </select>
+                {% else %}
                 <select id="open_port_list" multiple class="form-control bg-dark">
                   <option class="list-group-item text-white bg-dark" disabled>Open Ports</option>
                 </select>
+                {% endif %}
               </div>
             </fieldset>
           </form>
@@ -124,10 +172,87 @@
       </div>
     </div>
     <br><br>
-    <div class="row d-flex justify-content-center">
+    <div class="row d-flex justify-content-around">
+      {% if result %}
+      <a class="btn btn-primary col-sm-5" href="javascript:updateHost({{result.host_id}})">Update</a>
+      <a class="btn btn-primary col-sm-5" href="javascript:deleteHost({{result.host_id}})">Delete</a>
+      {% else %}
       <a class="btn btn-primary col-sm-12" href="javascript:saveData()">Save</a>
+      {% endif %}
     </div>
   </div>
+
+  <script>
+
+    function updateHost(host_id) {
+
+      var hostip = document.getElementById("hostip").value;
+      var hostname = document.getElementById("hostname").value;
+      var provider = document.getElementById("provider").value;
+      var secure_proxy = "";
+      var unsecure_proxy = "";
+      var secure_ports_list = document.getElementById("secure_port_list");
+      var open_port_list = document.getElementById("open_port_list");
+
+      if (secure_ip.checked) {
+        secure_proxy = document.getElementById("secure_ip_text").value;
+      }
+
+      if (unsecure_ip.checked) {
+        unsecure_proxy = document.getElementById("unsecure_ip_text").value;
+      }
+
+      var sp_string = "";
+      var op_string = "";
+
+      var i;
+
+      for (i = 0; i < secure_ports_list.length; i++) {
+        sp_string = sp_string + secure_ports_list.options[i].text + "::";
+      }
+
+      for (i = 0; i < open_port_list.length; i++) {
+        op_string = op_string + open_port_list.options[i].text + "::";
+      }
+
+      $.ajax({
+
+        type: "GET",
+        url: document.URL + "/updateHost",
+        data: {
+          'host_id': host_id,
+          'host_ip': hostip,
+          'hostname': hostname,
+          'provider': provider,
+          'secure_ports': sp_string,
+          'open_ports': op_string,
+          'secure_proxy': secure_proxy,
+          'unsecure_proxy': unsecure_proxy
+        },
+        dataType: 'html',
+        success: function (data) {
+          if (data) {
+            $('#results').html('<div class="container">\
+          <div class="alert alert-success alert-dismissible">\
+          <button type="button" class="close" data-dismiss="alert">&times;</button>\
+          <strong>Success!</strong> Host Updated and Scan Initiated!.\
+          </div></div>');
+          }
+          else {
+            $('#results').html('<div class="container">\
+          <div class="alert alert-danger alert-dismissible">\
+          <button type="button" class="close" data-dismiss="alert">&times;</button>\
+          <strong>Oops!</strong> Something went wrong!.\
+          </div></div>');
+          }
+        }
+
+      });
+
+    };
+
+
+  </script>
 
 </body>
 

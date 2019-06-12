@@ -37,7 +37,7 @@
   </nav>
 
   <div class="container">
-    <nav class="navbar navbar-expand-md bg-dark navbar-dark" style="margin-top: 70px">
+    <nav class="navbar navbar-expand-md bg-primary navbar-dark" style="margin-top: 70px">
       <a class="navbar-brand" href="#">Port Scanner</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar2">
         <span class="navbar-toggler-icon"></span>
@@ -185,11 +185,11 @@
       var secure_ports_list = document.getElementById("secure_port_list");
       var open_port_list = document.getElementById("open_port_list");
 
-      if(secure_ip.checked) {
+      if (secure_ip.checked) {
         secure_proxy = document.getElementById("secure_ip_text").value;
       }
 
-      if(unsecure_ip.checked) {
+      if (unsecure_ip.checked) {
         unsecure_proxy = document.getElementById("unsecure_ip_text").value;
       }
 
@@ -330,58 +330,6 @@
       }
     };
 
-    function inaccessible() {
-      var checkBox = document.getElementById("inaccessible");
-      var text = document.getElementById("inaccessible_text");
-      var select_box = document.getElementById("inaccessible_select")
-      if (checkBox.checked == true) {
-        text.disabled = false;
-        select_box.disabled = false;
-      } else {
-        text.disabled = true;
-        select_box.disabled = true;
-      }
-    };
-
-    function insecure() {
-      var checkBox = document.getElementById("insecure");
-      var text = document.getElementById("insecure_text");
-      var select_box = document.getElementById("insecure_select")
-      if (checkBox.checked == true) {
-        text.disabled = false;
-        select_box.disabled = false;
-      } else {
-        text.disabled = true;
-        select_box.disabled = true;
-      }
-    };
-
-    function secure() {
-      var checkBox = document.getElementById("secure");
-      var text = document.getElementById("secure_text");
-      var select_box = document.getElementById("secure_select")
-      if (checkBox.checked == true) {
-        text.disabled = false;
-        select_box.disabled = false;
-      } else {
-        text.disabled = true;
-        select_box.disabled = true;
-      }
-    };
-
-    function accessible() {
-      var checkBox = document.getElementById("accessible");
-      var text = document.getElementById("accessible_text");
-      var select_box = document.getElementById("accessible_select")
-      if (checkBox.checked == true) {
-        text.disabled = false;
-        select_box.disabled = false;
-      } else {
-        text.disabled = true;
-        select_box.disabled = true;
-      }
-    };
-
     $(document).ready(function () {
       var table = $('#all_host_table').DataTable({ scrollX: true });
     });
@@ -406,6 +354,8 @@
         }
       });
     };
+
+
   </script>
 </body>
 

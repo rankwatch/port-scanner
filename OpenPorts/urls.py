@@ -10,5 +10,8 @@ urlpatterns = [
     url(r'^home/addnewhost', views.addnewhost, name="addnewhost"),
     url(r'^home/add_settings', views.add_settings, name="add_settings"),
     url(r'^home/new_settings', views.new_settings, name="new_settings"),
-    url(r'^home/allhosts', views.allhosts, name="allhosts")
+    url(r'^home/allhosts', views.allhosts, name="allhosts"),
+    url(r'^home/signup$', views.signup, name="signup"),
+    url(r'^home/editHost$', views.editHost, name="editHost"),
+    url(r'^home/updateHost$', views.updateHost, name="updateHost")
 ]

@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.shortcuts import render
+from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm
 from .tasks import *
 from .models import *
+
 
 import ast
 
@@ -60,10 +64,6 @@ def addhost(request):
 
 @login_required
 def addnewhost(request):
-
-    print("\n"*10)
-    print("inside addnewhost")
-    print("\n"*10)
 
     s = request.GET.get('secure_proxy')
     u = request.GET.get('unsecure_proxy')
@@ -168,23 +168,24 @@ def allhosts(request):
 
             try:
                 secure_open = [int(x.strip())
-                            for x in secure_res.secure_open_ports.split(",")]
+                               for x in secure_res.secure_open_ports.split(",")]
 
             except:
                 secure_open = []
 
             try:
                 unsecure_open = [int(x.strip())
-                                for x in secure_res.unsecure_open_ports.split(",")]
+                                 for x in secure_res.unsecure_open_ports.split(",")]
             except:
                 unsecure_open = []
 
-            host_dic["secure_ports"] = len(set(secure_open) - set(unsecure_open))
+            host_dic["secure_ports"] = len(
+                set(secure_open) - set(unsecure_open))
 
             try:
                 host_dic["unsecure_ports"] = len(
                     [int(x.strip())
-                    for x in secure_res.unsecure_open_ports.split(",")]
+                     for x in secure_res.unsecure_open_ports.split(",")]
                 )
             except:
                 host_dic["unsecure_ports"] = 0
@@ -192,7 +193,7 @@ def allhosts(request):
             try:
                 secure_closed = len(
                     [int(x.strip())
-                    for x in secure_res.secure_closed_ports.split(",")]
+                     for x in secure_res.secure_closed_ports.split(",")]
                 )
             except:
                 secure_closed = 0
@@ -220,3 +221,71 @@ def allhosts(request):
             print(e)
 
     return render(request, "view_All_Hosts.html", {"result": res})
+
+
+@login_required
+def editHost(request):
+    print("in edit host")
+    host = Host.objects.get(host_id=request.GET.get("host_id"))
+    sec = SecuredPort.objects.get(host=host)
+    op = OpenPort.objects.get(host=host)
+    host_dic = {
+        "host_id": host.host_id,
+        "host_ip": host.ip,
+        "host_name": host.host_name,
+        "provider": host.provider,
+        "secure_proxy_ip": host.secure_proxy_ip,
+        "unsecure_proxy_ip": host.unsecure_proxy_ip,
+        "open_ports": [str(x.strip()) for x in op.unsecured_ports.split(",")],
+        "secure_ports": [str(x.strip()) for x in sec.secured_ports.split(",")]
+    }
+    return render(request, "add_host_ip.html", {"result": host_dic})
+
+
+def signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('home')
+    else:
+        form = UserCreationForm()
+    return render(request, 'signup.html', {'form': form})
+
+
+@login_required
+def updateHost(request):
+
+    s = request.GET.get('secure_proxy')
+    u = request.GET.get('unsecure_proxy')
+    config = Settings.objects.filter(
+        user=User.objects.get(
+            username=str(request.user.username))).last()
+
+    if len(s) == 0:
+        secure_proxy = str(config.secure_proxy_ip)+":" + \
+            str(config.secure_proxy_port)
+    else:
+        secure_proxy = s
+
+    if len(u) == 0:
+        unsecure_proxy = str(config.unsecure_proxy_ip)+":" + \
+            str(config.unsecure_proxy_port)
+    else:
+        unsecure_proxy = u
+
+    updateHostinDB.delay(request.GET.get('host_id'),
+                         request.user.username,
+                         request.GET.get('host_ip'),
+                         request.GET.get('hostname'),
+                         request.GET.get('provider'),
+                         request.GET.get('secure_ports'),
+                         request.GET.get('open_ports'),
+                         secure_proxy,
+                         unsecure_proxy)
+
+    return HttpResponse("Success")

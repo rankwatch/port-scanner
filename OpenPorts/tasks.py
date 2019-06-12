@@ -120,3 +120,36 @@ def addHostToDB(username, hostip, hostname, provider,
     up.save()
 
     scanLastHost(username)
+
+
+@app.task
+def updateHostinDB(host_id, username, hostip, hostname,
+                   provider, secure_ports, open_ports,
+                   secure_proxy, unsecure_proxy):
+
+    obj, created = Host.objects.update_or_create(
+        host_id=host_id,
+        defaults={
+            'host_ip': hostip,
+            'host_name': hostname,
+            'provider': provider,
+            'secure_proxy': secure_proxy,
+            'unsecure_proxy': unsecure_proxy
+        },
+    )
+
+    obj_1, created_1 = SecuredPort.objects.update_or_create(
+        host=Host.objects.get(host_id=host_id),
+        added_by=User.objects.get(username=username),
+        defaults={
+            'secured_ports': ", ".join(secure_ports.split("::")[1:-1])
+        }
+    )
+
+    obj_2, created_2 = OpenPort.objects.update_or_create(
+        host=Host.objects.get(host_id=host_id),
+        added_by=User.objects.get(username=username),
+        defaults={
+            'unsecured_ports': ", ".join(open_ports.split("::")[1:-1])
+        }
+    )
