@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Settings</title>
+
+</head>
+
+<body>
+  <div class="container col-sm-10 d-flex justify-content-center">
+    <div class="card  bg-light col-sm-7" style="padding: 3%;">
+      <div class="card-title oi oi-cog ">
+        Settings
+      </div>
+      <div class="card-body">
+        {% if result %}
+        <div class="row small">
+          <div class="col-sm-5">
+            <input type="checkbox" id="secure_ip_settings" onclick="myFunctionSettings()" checked>&nbsp;&nbsp;Specify
+            Secured
+            Proxy IP:
+          </div>
+          <div class="col-sm-7">
+            <input type="text" class="form-control h-75" id="secure_ip_text_settings" placeholder="255.255.255.255:5000"
+              value={{result.Secure}}>
+          </div>
+        </div>
+        <div class="row small">
+          <div class="col-sm-5">
+            <input type="checkbox" id="unsecure_ip_settings" onclick="myFunctionSettings1()" checked>&nbsp;&nbsp;Specify
+            Unsecured Proxy IP:
+          </div>
+          <div class="col-sm-7">
+            <input type="text" class="form-control h-75" id="unsecure_ip_text_settings"
+              placeholder="255.255.255.255:5000" value={{result.unsecure}}>
+          </div>
+        </div>
+        <button id="save" class="btn btn-primary d-flex justify-content-center" onclick="addNewSettings()">Update
+          Settings</button> {% else %}
+        <div class="row small">
+          <div class="col-sm-5">
+            <input type="checkbox" id="secure_ip_settings" onclick="myFunctionSettings()">&nbsp;&nbsp;Specify Secured
+            Proxy IP:
+          </div>
+          <div class="col-sm-7">
+            <input type="text" class="form-control h-75" id="secure_ip_text_settings" placeholder="255.255.255.255:5000"
+              disabled="true">
+          </div>
+        </div>
+        <div class="row small">
+          <div class="col-sm-5">
+            <input type="checkbox" id="unsecure_ip_settings" onclick="myFunctionSettings1()">&nbsp;&nbsp;Specify
+            Unsecured Proxy IP:
+          </div>
+          <div class="col-sm-7">
+            <input type="text" class="form-control h-75" id="unsecure_ip_text_settings"
+              placeholder="255.255.255.255:5000" disabled="true">
+          </div>
+        </div>
+        <button id="save" class="btn btn-primary d-flex justify-content-center" onclick="addNewSettings()">Save
+          Settings</button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <script>
+    document.getElementById("secure_ip_text_settings").oninput = function (e) {
+      if (validateIpAndPort(this.value)) {
+        this.className = "form-control h-75 is-valid";
+        document.getElementById("save").disabled = false;
+      } else {
+        this.className = "form-control h-75 is-invalid";
+        document.getElementById("save").disabled = true;
+      }
+    }
+
+    document.getElementById("unsecure_ip_text_settings").oninput = function (e) {
+      if (validateIpAndPort(this.value)) {
+        this.className = "form-control h-75 is-valid";
+        document.getElementById("save").disabled = false;
+      } else {
+        this.className = "form-control h-75 is-invalid";
+        document.getElementById("save").disabled = true;
+      }
+    }
+
+
+    function validateIpAndPort(input) {
+      var parts = input.split(":");
+      var ip = parts[0].split(".");
+      var port = parts[1];
+      return validateNum(port, 1, 65535) && ip.length == 4 && ip.every(function (segment) {
+        return validateNum(segment, 0, 255);
+      });
+    }
+
+    function validateNum(input, min, max) {
+      var num = +input;
+      return num >= min && num <= max && input === num.toString();
+    }
+
+  </script>
+</body>
+
+</html>

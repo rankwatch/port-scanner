@@ -10,21 +10,13 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   </head>
   <body>
-    <div class="jumbotron jumbotron-fluid bg-primary text-white">
         <div class="container text-center">
-            <h1>Port Scanner</h1>
-            <p>A fast port scanning solution to identify and detect vulnerabilities.</p>
             <br>
-            <h3>Welcome User 
               {% if user.is_authenticated %}
                 {{ user.username }}</h3><br>
                 <a class="btn btn-warning btn-block" href="{% url 'logout' %}">Logout</a>
-              {% else %}
-                <!-- </h3><br>
-                <a class="btn btn-warning" href="{% url 'login' %}">Login</a> -->
               {% endif %}
         </div>
-    </div>
     <main>
       {% block content %}
       {% endblock %}

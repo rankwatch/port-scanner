@@ -16,11 +16,16 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 import django.contrib.auth.views as auth_views
+from OpenPorts import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^OpenPorts/', include('OpenPorts.urls')),
-    url(r'^accounts/login/$', auth_views.LoginView.as_view(template_name="login.html"), name="login"),
-    url(r'^accounts/logout/$', auth_views.LogoutView.as_view(template_name="logout.html"), name='logout'),
-    url(r'^', auth_views.LoginView.as_view(template_name="login.html"), name="login")
+    url(r'^accounts/login/$',
+        auth_views.LoginView.as_view(template_name="login.html"), name="login"),
+    url(r'^accounts/logout/$',
+        auth_views.LogoutView.as_view(template_name="logout.html"), name='logout'),
+    url(r'^', auth_views.LoginView.as_view(
+        template_name="login.html"), name="login"),
+
 ]
