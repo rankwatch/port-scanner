@@ -74,84 +74,77 @@
                                     <label class="custom-control-label" for="check2">Status Bad</label>
                                 </div>
                                 <div class="form-group row">
-                                    <label for="inaccessible_text">
-                                        <label for="inaccessible_select" class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input"
-                                                onclick='javascript:showInaccessible();' id="inaccessible">
-                                            <label class="custom-control-label" for="inaccessible">Inaccessible</label>
-                                        </label>
-                                        <select class="form-control col-sm-12" id="inaccessible_select" disabled hidden>
-                                            <option class="list-group-item text-white bg-dark small">More Than
-                                            </option>
-                                            <option class="list-group-item text-white bg-dark small">Less Than
-                                            </option>
-                                            <option class="list-group-item text-white bg-dark small">Equal To
-                                            </option>
-                                        </select>
+                                    <label for="inaccessible_select" class="custom-control custom-checkbox col-12">
+                                        <input type="checkbox" class="custom-control-input"
+                                            onclick='javascript:showInaccessible();' id="inaccessible">
+                                        <label class="custom-control-label" for="inaccessible">Inaccessible</label>
                                     </label>
-                                    <input class="form-control" type="text" id="inaccessible_text" disabled hidden>
+                                    <select class="form-control form-control-sm col-8" id="inaccessible_select" disabled hidden>
+                                        <option class="list-group-item text-white bg-dark">More Than
+                                        </option>
+                                        <option class="list-group-item text-white bg-dark">Less Than
+                                        </option>
+                                        <option class="list-group-item text-white bg-dark">Equal To
+                                        </option>
+                                    </select>
+                                    <input class="form-control form-control-sm offset-1 col-3" type="text" id="inaccessible_text" disabled
+                                        hidden>
                                 </div>
 
                                 <div class="form-group row">
-                                    <label for="insecure_text">
-                                        <label for="insecure_select" class="custom-control custom-checkbox">
+                                        <label for="insecure_select" class="custom-control custom-checkbox col-12">
                                             <input type="checkbox" class="custom-control-input"
                                                 onclick='javascript:showInsecure();' id="insecure">
                                             <label class="custom-control-label" for="insecure">Insecure</label>
                                         </label>
-                                        <select class="form-control col-sm-12" id="insecure_select" disabled hidden>
-                                            <option class="list-group-item text-white bg-dark small">More Than
+                                        <select class="form-control form-control-sm col-8" id="insecure_select" disabled hidden>
+                                            <option class="list-group-item text-white bg-dark">More Than
                                             </option>
-                                            <option class="list-group-item text-white bg-dark small">Less Than
+                                            <option class="list-group-item text-white bg-dark">Less Than
                                             </option>
-                                            <option class="list-group-item text-white bg-dark small">Equal To
+                                            <option class="list-group-item text-white bg-dark">Equal To
                                             </option>
                                         </select>
-                                    </label>
-                                    <input class="form-control" type="text" id="insecure_text" disabled hidden>
+                                    <input class="form-control form-control-sm offset-1 col-3" type="text" id="insecure_text" disabled hidden>
                                 </div>
 
 
                                 <div class="form-group row">
-                                    <label for="secure_text">
-                                        <label for="secure_select" class="custom-control custom-checkbox">
+                                        <label for="secure_select" class="custom-control custom-checkbox col-12">
                                             <input type="checkbox" class="custom-control-input"
                                                 onclick='javascript:showSecure();' id="secure">
                                             <label class="custom-control-label" for="secure">Secure</label>
                                         </label>
-                                        <select class="form-control col-sm-12" id="secure_select" disabled hidden>
-                                            <option class="list-group-item text-white bg-dark small">More Than
+                                        <select class="form-control form-control-sm col-8" id="secure_select" disabled hidden>
+                                            <option class="list-group-item text-white bg-dark">More Than
                                             </option>
-                                            <option class="list-group-item text-white bg-dark small">Less Than
+                                            <option class="list-group-item text-white bg-dark">Less Than
                                             </option>
-                                            <option class="list-group-item text-white bg-dark small">Equal To
+                                            <option class="list-group-item text-white bg-dark">Equal To
                                             </option>
                                         </select>
-                                    </label>
-                                    <input class="form-control" type="text" id="secure_text" disabled hidden>
+                                    <input class="form-control form-control-sm offset-1 col-3" type="text" id="secure_text" disabled hidden>
                                 </div>
 
 
                                 <div class="form-group row">
-                                    <label for="accessible_text">
-                                        <label for="accessible_select" class="custom-control custom-checkbox">
+                                        <label for="accessible_select" class="custom-control custom-checkbox col-12">
                                             <input type="checkbox" class="custom-control-input"
                                                 onclick='javascript:showAccessible();' id="accessible">
                                             <label class="custom-control-label" for="accessible">Accessible</label>
                                         </label>
-                                        <select class="form-control col-sm-12" id="accessible_select" disabled hidden>
-                                            <option class="list-group-item text-white bg-dark small">More Than
+                                        <select class="form-control form-control-sm col-8" id="accessible_select" disabled hidden>
+                                            <option class="list-group-item text-white bg-dark">More Than
                                             </option>
-                                            <option class="list-group-item text-white bg-dark small">Less Than
+                                            <option class="list-group-item text-white bg-dark">Less Than
                                             </option>
-                                            <option class="list-group-item text-white bg-dark small">Equal To
+                                            <option class="list-group-item text-white bg-dark">Equal To
                                             </option>
                                         </select>
-                                    </label>
-                                    <input class="form-control" type="text" id="accessible_text" disabled hidden>
+                                    <input class="form-control form-control-sm offset-1 col-3" type="text" id="accessible_text" disabled hidden>
                                 </div>
                                 <div class="form-group row d-flex justify-content-center">
-                                    <button class="btn btn-primary btn-block">Apply Filter</button>
+                                    <button class="btn btn-primary btn-block" onclick="javascript:filterResults();">Apply Filter</button>
                                 </div>
                             </fieldset>
                         </form>
@@ -172,6 +165,10 @@
         $(document).ready(function () {
             var table = $('#all_host_table').DataTable({ "scrollX": true });
         });
+
+        function filterResults() {
+            
+        }
 
         function editHost(host_id) {
 

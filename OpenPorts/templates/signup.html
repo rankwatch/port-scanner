@@ -5,7 +5,7 @@
     <title>Sign Up</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://bootswatch.com/4/slate/bootstrap.min.css">
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css"
         integrity="sha256-BJ/G+e+y7bQdrYkS2RBTyNfBHpA9IuGaPmf9htub5MQ=" crossorigin="anonymous" />
@@ -23,7 +23,10 @@
         </button>
         <div class="collapse navbar-collapse" id="collapsibleNavbar1">
             <ul class="navbar-nav ml-auto">
-
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}"><span class="oi oi-account-login"></span> Log In
+                    </a>
+                </li>
             </ul>
         </div>
     </nav>
@@ -31,34 +34,86 @@
 
 
     <div class="container d-flex justify-content-center" style="margin-top: 15%;">
-        <div class="card  col-sm-5" style="padding: 5%;   outline: #000000 solid 2px; ">
+        <div class="card col-sm-5 bg-dark border-dark">
             <div class="card-body">
-                <form method="post">
+                <form method="post" id="signupform">
                     {% csrf_token %}
-                    <label for="username">User Name :</label>
-
-                    <div class="form-control text-center">
-                        {{form.username}}
+                    <fieldset>
+                        <legend class="text-center lead">Signup</legend>
+                        <div class="form-group row">
+                            <label for="username">User Name:</label>
+                            <input type="text" class="form-control col-sm-12" id="username" name="username">
+                        </div>
+                        <div class="form-group row">
+                            <label for="password1">Password:</label>
+                            <input type="password" class="form-control col-sm-12" id="password1" name="password1">
+                        </div>
+                        <div class="form-group row">
+                            <label for="password2">Confirm Password:</label>
+                            <input type="password" id="password2" name="password2" class="form-control col-sm-12">
+                        </div>
+                    </fieldset>
+                    <div class="form-group row">
+                        <button class="btn btn-primary btn-block" onclick="javascript:submitForm()">Submit</button>
                     </div>
-                    <br>
-                    <label for="password">Password :</label>
-                    <div class="form-control text-center">
-                        {{form.password1}}
+                    {% if success %}
+                    <div class="form-group row" id="success">
+                        <div class="alert alert-dismissable alert-success col-sm-12">
+                            <h5 class="alert-heading">
+                                Success! Please login to continue.
+                            </h5>
+                        </div>
                     </div>
-                    <br>
-                    <label for="password">Confirm Password :</label>
-
-                    <div class="form-control text-center ">
-                        {{form.password2}}
+                    {% endif %}
+                    {% if form.errors %}
+                    <div class="form-group row">
+                        <div class="col-sm-12 alert alert-danger">
+                            <h5 class="alert-heading">
+                                <span class="oi oi-ban"></span>&nbsp;
+                                Sorry! error while creating user:
+                            </h5>
+                            <p>
+                                {{form.username.errors}}
+                            </p>
+                            <p>
+                                {{form.password1.errors}}
+                            </p>
+                            <p>
+                                {{form.password2.errors}}
+                            </p>
+                        </div>
                     </div>
-                    <br>
-                    <!-- {{ form.as_p }} -->
-                    <button type="submit" class="btn btn-primary form-control text-center"> Sign up</button>
+                    {% endif %}
                 </form>
             </div>
         </div>
     </div>
 
+    <script>
+
+        function submitForm() {
+
+            var formData = $("#signupform").serializeArray();
+
+            $.ajax({
+
+                type: 'POST',
+                url: document.URL,
+                data: formData,
+                dataType: 'html',
+                success: function (data) {
+                    if (data) {
+                        $("#success").html('<div class="col-sm-12 alert alert-success">\
+                            <h5 class="alert-heading">\
+                            <span class="oi oi-ban"></span>&nbsp;\
+                            Success! Please login to continue.\
+                            </h5></div>')
+                    }
+                }
+            });
+        };
+
+    </script>
 
 </body>
 
