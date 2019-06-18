@@ -5,27 +5,29 @@
   <title>Port Scanner</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://bootswatch.com/4/slate/bootstrap.min.css">
+  <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css"
     integrity="sha256-BJ/G+e+y7bQdrYkS2RBTyNfBHpA9IuGaPmf9htub5MQ=" crossorigin="anonymous" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
 
 <body>
 
-  <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top">
-    <a class="navbar-brand" href="#">Port Scanner</a>
+  <nav class="navbar navbar-expand-md bg-primary navbar-dark fixed-top">
+    <a class="navbar-brand" href="javascript:void(0)">Port Scanner</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar1">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="collapsibleNavbar1">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'signup' %}"><span class="oi oi-account-signup"></span> SignUp </a>
+          <a class="nav-link" href="{% url 'signup' %}"><span class="oi oi-account-signup"></span> Sign Up </a>
         </li>
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'logout' %}"><span class="oi oi-account-logout"></span> Log Out </a>
+        </li>
+        {% endif %}
       </ul>
     </div>
   </nav>
@@ -38,14 +40,14 @@
         {% else %}
         <form id="login-form" method="post" action="{% url 'login' %}">
           <fieldset>
-            <legend class="text-center lead">Login</legend>
+            <legend class="text-center text-white lead">Login</legend>
             {% csrf_token %}
             <div class="form-group row">
-              <label for="username">Username:</label>
+              <label for="username" class="text-light">Username</label>
               <input class="form-control" id="username" name="username" type="text">
             </div>
             <div class="form-group row">
-              <label for="password">Password:</label>
+              <label for="password" class="text-light">Password</label>
               <input type="password" id="password" name="password" class="form-control">
             </div>
             <div class="form-group row">
@@ -53,10 +55,10 @@
             </div>
             {% if form.errors %}
             <div class="form-group row">
-              <h5 class="col-sm-12 alert alert-danger">
+              <p class="col-sm-12 alert alert-danger">
                 <span class="oi oi-ban"></span>&nbsp;
-                Sorry! Login failed. Try again. 
-              </h5>
+                Sorry! <strong>Login failed</strong>. Try again.
+              </p>
             </div>
             {% endif %}
             <input type="hidden" name="next" value="{{ next }}" />
@@ -66,6 +68,10 @@
       </div>
     </div>
   </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
 </body>
 

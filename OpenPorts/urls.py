@@ -13,5 +13,7 @@ urlpatterns = [
     url(r'^home/allhosts', views.allhosts, name="allhosts"),
     url(r'^home/signup$', views.signup, name="signup"),
     url(r'^home/editHost$', views.editHost, name="editHost"),
-    url(r'^home/updateHost$', views.updateHost, name="updateHost")
+    url(r'^home/updateHost$', views.updateHost, name="updateHost"),
+    url(r'^home/deleteHost$', views.deleteHost, name="deleteHost"),
+    url(r'^home/dashboard$', views.loadDashboard, name="loadDashboard")
 ]

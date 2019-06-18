@@ -45,8 +45,12 @@
               <input id="timeout" type="text" class="form-control" value={{result.timeout}}>
             </div>
             <div class="form-group row">
-              <button id="save" class="form-control btn btn-primary btn-block" onclick="addNewSettings()">Update
-                Settings</button>
+              <label for="scanfrequency">Scan Frequency</label>
+              <input id="scanfrequency" type="text" class="form-control" value={{result.scanfrequency}}>
+            </div>
+            <div class="form-group row">
+              <a id="save" class="form-control btn btn-primary btn-block" href="javascript:addNewSettings()">Update
+                Settings</a>
             </div>
           </fieldset>
         </form>
@@ -81,8 +85,12 @@
               <input id="timeout" type="text" class="form-control" value=1>
             </div>
             <div class="form-group row">
-              <button id="save" class="form-control btn btn-primary btn-block" onclick="addNewSettings()">Update
-                Settings</button>
+              <label for="scanfrequency">Scan Frequency</label>
+              <input id="scanfrequency" type="text" class="form-control" placeholder="m:h:d:dM:MY">
+            </div>
+            <div class="form-group row">
+              <a id="save" class="form-control btn btn-primary btn-block" href="javascript:addNewSettings()">Add
+                Settings</a>
             </div>
           </fieldset>
         </form>
@@ -93,24 +101,41 @@
   <script>
     document.getElementById("secure_ip_text_settings").oninput = function (e) {
       if (validateIpAndPort(this.value)) {
-        this.className = "form-control h-75 is-valid";
-        document.getElementById("save").disabled = false;
+        this.className = "form-control is-valid";
+        document.getElementById("save").className = "form-control btn btn-primary btn-block";
       } else {
-        this.className = "form-control h-75 is-invalid";
-        document.getElementById("save").disabled = true;
+        this.className = "form-control is-invalid";
+        document.getElementById("save").className = "form-control btn btn-primary btn-block disabled";
       }
     }
 
     document.getElementById("unsecure_ip_text_settings").oninput = function (e) {
       if (validateIpAndPort(this.value)) {
-        this.className = "form-control h-75 is-valid";
-        document.getElementById("save").disabled = false;
+        this.className = "form-control is-valid";
+        document.getElementById("save").className = "form-control btn btn-primary btn-block";
       } else {
-        this.className = "form-control h-75 is-invalid";
-        document.getElementById("save").disabled = true;
+        this.className = "form-control is-invalid";
+        document.getElementById("save").className = "form-control btn btn-primary btn-block disabled";
       }
     }
 
+    document.getElementById("scanfrequency").oninput = function (e) {
+      if (validateFrequency(this.value)) {
+        this.className = "form-control is-valid";
+        document.getElementById("save").className = "form-control btn btn-primary btn-block";
+      } else {
+        this.className = "form-control is-invalid";
+        document.getElementById("save").className = "form-control btn btn-primary btn-block disabled";
+      }
+    }
+
+    function validateFrequency(input) {
+      var parts = input.split(":");
+      if (parts.length == 5)
+        return true;
+      else
+        return false;
+    }
 
     function validateIpAndPort(input) {
       var parts = input.split(":");
@@ -125,6 +150,79 @@
       var num = +input;
       return num >= min && num <= max && input === num.toString();
     }
+
+    function addNewSettings() {
+      var checkBox = document.getElementById("secure_ip_settings");
+      var threads = $("#threads").val();
+      var timeout = $("#timeout").val();
+      var scanfrequency = $("#scanfrequency").val();
+      if (checkBox.checked == false) {
+        alert("Please Select the Secure IP")
+        return;
+      }
+      else {
+        var text1 = document.getElementById("secure_ip_text_settings").value;
+      }
+      var checkBox1 = document.getElementById("unsecure_ip_settings");
+      if (checkBox1.checked == false) {
+        alert("Please Select the Unsecure IP")
+        return;
+      }
+      else {
+        var text2 = document.getElementById("unsecure_ip_text_settings").value;
+      }
+      console.log(document.URL);
+
+      $.ajax({
+        type: "GET",
+        url: document.URL + "/new_settings",
+        data: {
+          'secure_proxy': text1,
+          'unsecure_proxy': text2,
+          'threads': threads,
+          'timeout': timeout,
+          'scanfrequency': scanfrequency
+        },
+        dataType: 'html',
+        success: function (data) {
+          if (data) {
+            console.log(document.URL);
+            $("#results").html('<div class="container">\
+                <div class="alert alert-success alert-dismissible">\
+                <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                <strong>Success!</strong> Settings saved.\
+                </div></div>');
+          }
+          else {
+            $("#results").html('<div class="container">\
+                <div class="alert alert-danger alert-dismissible">\
+                <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                <strong>Oops!</strong> Something went wrong!\
+                </div></div>');
+          }
+        }
+      });
+    };
+
+    function myFunctionSettings() {
+      var checkBox = document.getElementById("secure_ip_settings");
+      var text = document.getElementById("secure_ip_text_settings");
+      if (checkBox.checked == true) {
+        text.disabled = false;
+      } else {
+        text.disabled = true;
+      }
+    };
+
+    function myFunctionSettings1() {
+      var checkBox = document.getElementById("unsecure_ip_settings");
+      var text = document.getElementById("unsecure_ip_text_settings");
+      if (checkBox.checked == true) {
+        text.disabled = false;
+      } else {
+        text.disabled = true;
+      }
+    };
 
   </script>
 </body>

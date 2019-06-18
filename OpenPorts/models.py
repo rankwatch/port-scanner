@@ -18,8 +18,8 @@ class Host(models.Model):
     added_on = models.DateTimeField(default=datetime.now, blank=True)
     modified_on = models.DateField(blank=True)
 
-    secure_proxy_ip = models.GenericIPAddressField()
-    unsecure_proxy_ip = models.GenericIPAddressField()
+    secure_proxy_ip = models.CharField(max_length=21)
+    unsecure_proxy_ip = models.CharField(max_length=21)
 
     provider = models.CharField(max_length=255)
 
@@ -58,7 +58,6 @@ class OpenPort(models.Model):
 
 class Settings(models.Model):
     setting_id = models.IntegerField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     secure_proxy_ip = models.GenericIPAddressField()
     unsecure_proxy_ip = models.GenericIPAddressField()
@@ -69,11 +68,13 @@ class Settings(models.Model):
     threads = models.IntegerField(default=100, blank=True)
     timeout = models.IntegerField(default=1, blank=True)
 
+    schedule = models.CharField(max_length=255)
+
     def publish(self):
         self.save()
 
     def __str__(self):
-        return str(self.user.username) + " CONFIG-" + str(self.setting_id)
+        return "CONFIG-" + str(self.setting_id)
 
 
 class SecurePortResult(models.Model):

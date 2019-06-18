@@ -2,269 +2,264 @@
 <html lang="en">
 
 <head>
-    <title>Bootstrap Example</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>View All Hosts</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="https://bootswatch.com/4/slate/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
 
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
 
 <body>
-    <div class="container">
-        <br>
-        <div class="row">
-            <div class="col-sm-9">
-                <table class="table table-hover" id="all_host_table" style="width:100%;">
-                    <thead>
-                        <tr>
-                            <th scope="col">Host</th>
-                            <th scope="col">Secure Port</th>
-                            <th scope="col">Insecure Port</th>
-                            <th scope="col">Open Port</th>
-                            <th scope="col">Inaccessible Port</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+  <div class="container">
+    <br>
+    <div class="row">
+      <div class="col-sm-9">
+        <table class="table table-hover" id="all_host_table" style="width:100%;">
+          <thead>
+            <tr>
+              <th scope="col">Host</th>
+              <th scope="col">Secure Port</th>
+              <th scope="col">Insecure Port</th>
+              <th scope="col">Open Port</th>
+              <th scope="col">Inaccessible Port</th>
+              <th scope="col">Status</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody>
 
-                        {% for k, v in result.items %}
+            {% for k, v in result.items %}
 
-                        <tr class="table-primary">
-                            <th scope="row">{{v.ip}}</th>
-                            <td>{{v.secure_ports}}</td>
-                            <td>{{v.unsecure_ports}}</td>
-                            <td>{{v.open_ports}}</td>
-                            <td>{{v.inaccessible}}</td>
-                            <td>{{v.status}}</td>
-                            <td>
-                                <a href="#" class="text-white">View Report</a> |
-                                <a href="javascript:editHost({{k}})" class="text-white">Edit</a>
-                            </td>
-                        </tr>
+            <tr class="table-primary">
+              <th scope="row">{{v.ip}}</th>
+              <td>{{v.secure_ports}}</td>
+              <td>{{v.unsecure_ports}}</td>
+              <td>{{v.open_ports}}</td>
+              <td>{{v.inaccessible}}</td>
+              <td>{{v.status}}</td>
+              <td>
+                <a href="javascript:void(0)" class="text-white">View Report</a> |
+                <a href="javascript:editHost({{k}})" class="text-white">Edit</a>
+              </td>
+            </tr>
 
-                        {% endfor %}
+            {% endfor %}
 
-                    </tbody>
-                </table>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="col-sm-3">
+        <!-- <div class="card bg-light p-2"> -->
+        <!-- <div class="card-body"> -->
+        <form class="p-2">
+          <fieldset>
+            <legend class="text-center lead">Filters</legend>
+            <div class="form-group row">
+              <textarea class="form-control" rows="4" name="text"
+                placeholder="IP/Host to filter seprated by (,)"></textarea>
+            </div>
+            <div class="form-group row text-success custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check1">
+              <label class="custom-control-label" for="check1">Status Good</label>
+            </div>
+            <div class="form-group row text-danger custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check2">
+              <label class="custom-control-label" for="check2">Status Bad</label>
+            </div>
+            <div class="form-group row">
+              <label for="inaccessible_select" class="custom-control custom-checkbox col-12">
+                <input type="checkbox" class="custom-control-input" onclick='javascript:showInaccessible();'
+                  id="inaccessible">
+                <label class="custom-control-label" for="inaccessible">Inaccessible</label>
+              </label>
+              <select class="form-control form-control-sm col-8" id="inaccessible_select" disabled hidden>
+                <option class="list-group-item text-white bg-dark">More Than
+                </option>
+                <option class="list-group-item text-white bg-dark">Less Than
+                </option>
+                <option class="list-group-item text-white bg-dark">Equal To
+                </option>
+              </select>
+              <input class="form-control form-control-sm offset-1 col-3" type="text" id="inaccessible_text" disabled
+                hidden>
             </div>
 
-            <div class="col-sm-3">
-                <div class="card bg-dark border-dark">
-                    <div class="card-body">
-                        <form>
-                            <fieldset>
-                                <legend class="text-center lead">Filters</legend>
-                                <div class="form-group row">
-                                    <textarea class="form-control" rows="4" name="text"
-                                        placeholder="IP/Host to filter seprated by (,)"></textarea>
-                                </div>
-                                <div class="form-group row text-success custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="check1">
-                                    <label class="custom-control-label" for="check1">Status Good</label>
-                                </div>
-                                <div class="form-group row text-danger custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="check2">
-                                    <label class="custom-control-label" for="check2">Status Bad</label>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="inaccessible_select" class="custom-control custom-checkbox col-12">
-                                        <input type="checkbox" class="custom-control-input"
-                                            onclick='javascript:showInaccessible();' id="inaccessible">
-                                        <label class="custom-control-label" for="inaccessible">Inaccessible</label>
-                                    </label>
-                                    <select class="form-control form-control-sm col-8" id="inaccessible_select" disabled hidden>
-                                        <option class="list-group-item text-white bg-dark">More Than
-                                        </option>
-                                        <option class="list-group-item text-white bg-dark">Less Than
-                                        </option>
-                                        <option class="list-group-item text-white bg-dark">Equal To
-                                        </option>
-                                    </select>
-                                    <input class="form-control form-control-sm offset-1 col-3" type="text" id="inaccessible_text" disabled
-                                        hidden>
-                                </div>
-
-                                <div class="form-group row">
-                                        <label for="insecure_select" class="custom-control custom-checkbox col-12">
-                                            <input type="checkbox" class="custom-control-input"
-                                                onclick='javascript:showInsecure();' id="insecure">
-                                            <label class="custom-control-label" for="insecure">Insecure</label>
-                                        </label>
-                                        <select class="form-control form-control-sm col-8" id="insecure_select" disabled hidden>
-                                            <option class="list-group-item text-white bg-dark">More Than
-                                            </option>
-                                            <option class="list-group-item text-white bg-dark">Less Than
-                                            </option>
-                                            <option class="list-group-item text-white bg-dark">Equal To
-                                            </option>
-                                        </select>
-                                    <input class="form-control form-control-sm offset-1 col-3" type="text" id="insecure_text" disabled hidden>
-                                </div>
-
-
-                                <div class="form-group row">
-                                        <label for="secure_select" class="custom-control custom-checkbox col-12">
-                                            <input type="checkbox" class="custom-control-input"
-                                                onclick='javascript:showSecure();' id="secure">
-                                            <label class="custom-control-label" for="secure">Secure</label>
-                                        </label>
-                                        <select class="form-control form-control-sm col-8" id="secure_select" disabled hidden>
-                                            <option class="list-group-item text-white bg-dark">More Than
-                                            </option>
-                                            <option class="list-group-item text-white bg-dark">Less Than
-                                            </option>
-                                            <option class="list-group-item text-white bg-dark">Equal To
-                                            </option>
-                                        </select>
-                                    <input class="form-control form-control-sm offset-1 col-3" type="text" id="secure_text" disabled hidden>
-                                </div>
-
-
-                                <div class="form-group row">
-                                        <label for="accessible_select" class="custom-control custom-checkbox col-12">
-                                            <input type="checkbox" class="custom-control-input"
-                                                onclick='javascript:showAccessible();' id="accessible">
-                                            <label class="custom-control-label" for="accessible">Accessible</label>
-                                        </label>
-                                        <select class="form-control form-control-sm col-8" id="accessible_select" disabled hidden>
-                                            <option class="list-group-item text-white bg-dark">More Than
-                                            </option>
-                                            <option class="list-group-item text-white bg-dark">Less Than
-                                            </option>
-                                            <option class="list-group-item text-white bg-dark">Equal To
-                                            </option>
-                                        </select>
-                                    <input class="form-control form-control-sm offset-1 col-3" type="text" id="accessible_text" disabled hidden>
-                                </div>
-                                <div class="form-group row d-flex justify-content-center">
-                                    <button class="btn btn-primary btn-block" onclick="javascript:filterResults();">Apply Filter</button>
-                                </div>
-                            </fieldset>
-                        </form>
-                    </div>
-                </div>
+            <div class="form-group row">
+              <label for="insecure_select" class="custom-control custom-checkbox col-12">
+                <input type="checkbox" class="custom-control-input" onclick='javascript:showInsecure();' id="insecure">
+                <label class="custom-control-label" for="insecure">Insecure</label>
+              </label>
+              <select class="form-control form-control-sm col-8" id="insecure_select" disabled hidden>
+                <option class="list-group-item text-white bg-dark">More Than
+                </option>
+                <option class="list-group-item text-white bg-dark">Less Than
+                </option>
+                <option class="list-group-item text-white bg-dark">Equal To
+                </option>
+              </select>
+              <input class="form-control form-control-sm offset-1 col-3" type="text" id="insecure_text" disabled hidden>
             </div>
-        </div>
 
+
+            <div class="form-group row">
+              <label for="secure_select" class="custom-control custom-checkbox col-12">
+                <input type="checkbox" class="custom-control-input" onclick='javascript:showSecure();' id="secure">
+                <label class="custom-control-label" for="secure">Secure</label>
+              </label>
+              <select class="form-control form-control-sm col-8" id="secure_select" disabled hidden>
+                <option class="list-group-item text-white bg-dark">More Than
+                </option>
+                <option class="list-group-item text-white bg-dark">Less Than
+                </option>
+                <option class="list-group-item text-white bg-dark">Equal To
+                </option>
+              </select>
+              <input class="form-control form-control-sm offset-1 col-3" type="text" id="secure_text" disabled hidden>
+            </div>
+
+
+            <div class="form-group row">
+              <label for="accessible_select" class="custom-control custom-checkbox col-12">
+                <input type="checkbox" class="custom-control-input" onclick='javascript:showAccessible();'
+                  id="accessible">
+                <label class="custom-control-label" for="accessible">Accessible</label>
+              </label>
+              <select class="form-control form-control-sm col-8" id="accessible_select" disabled hidden>
+                <option class="list-group-item text-white bg-dark">More Than
+                </option>
+                <option class="list-group-item text-white bg-dark">Less Than
+                </option>
+                <option class="list-group-item text-white bg-dark">Equal To
+                </option>
+              </select>
+              <input class="form-control form-control-sm offset-1 col-3" type="text" id="accessible_text" disabled
+                hidden>
+            </div>
+            <div class="form-group row d-flex justify-content-center">
+              <button class="btn btn-primary btn-block" onclick="javascript:filterResults();">Apply Filter</button>
+            </div>
+          </fieldset>
+        </form>
+        <!-- </div> -->
+        <!-- </div> -->
+      </div>
     </div>
 
-    <script>
+  </div>
 
-    </script>
-    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
-    <script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+  <script>
 
-        $(document).ready(function () {
-            var table = $('#all_host_table').DataTable({ "scrollX": true });
-        });
+    $(document).ready(function () {
+      var table = $('#all_host_table').DataTable({ "scrollX": true });
+    });
 
-        function filterResults() {
-            
-        }
+    function filterResults() {
 
-        function editHost(host_id) {
+    }
 
-            $.ajax({
-                type: 'GET',
-                url: document.URL + '/editHost',
-                data: {
-                    'host_id': host_id
-                },
-                dataType: 'html',
-                success: function (data) {
-                    if (data) {
-                        $("#results").html(data);
-                        $('#data-toggle-1').dropdown();
-                        $('#data-toggle-2').dropdown();
-                    } else {
-                        $('#results').html('<div class="container">\
+    function editHost(host_id) {
+
+      $.ajax({
+        type: 'GET',
+        url: document.URL + '/editHost',
+        data: {
+          'host_id': host_id
+        },
+        dataType: 'html',
+        success: function (data) {
+          if (data) {
+            $("#results").html(data);
+            $('#data-toggle-1').dropdown();
+            $('#data-toggle-2').dropdown();
+          } else {
+            $('#results').html('<div class="container">\
                       <div class="alert alert-danger alert-dismissible">\
                       <button type="button" class="close" data-dismiss="alert">&times;</button>\
                       <strong>Alert!</strong> Something went wrong!.\
                       </div></div>');
-                    }
-                }
-            });
-        };
+          }
+        }
+      });
+    };
 
-        function showInaccessible() {
-            var checkBox = document.getElementById("inaccessible");
-            var text = document.getElementById("inaccessible_text");
-            var select_box = document.getElementById("inaccessible_select")
-            if (checkBox.checked == true) {
-                text.disabled = false;
-                select_box.disabled = false;
-                text.hidden = false;
-                select_box.hidden = false;
-            } else {
-                text.disabled = true;
-                select_box.disabled = true;
-                text.hidden = true;
-                select_box.hidden = true;
-            }
-        };
+    function showInaccessible() {
+      var checkBox = document.getElementById("inaccessible");
+      var text = document.getElementById("inaccessible_text");
+      var select_box = document.getElementById("inaccessible_select")
+      if (checkBox.checked == true) {
+        text.disabled = false;
+        select_box.disabled = false;
+        text.hidden = false;
+        select_box.hidden = false;
+      } else {
+        text.disabled = true;
+        select_box.disabled = true;
+        text.hidden = true;
+        select_box.hidden = true;
+      }
+    };
 
-        function showInsecure() {
-            var checkBox = document.getElementById("insecure");
-            var text = document.getElementById("insecure_text");
-            var select_box = document.getElementById("insecure_select")
-            if (checkBox.checked == true) {
-                text.disabled = false;
-                select_box.disabled = false;
-                text.hidden = false;
-                select_box.hidden = false;
-            } else {
-                text.disabled = true;
-                select_box.disabled = true;
-                text.hidden = true;
-                select_box.hidden = true;
-            }
-        };
+    function showInsecure() {
+      var checkBox = document.getElementById("insecure");
+      var text = document.getElementById("insecure_text");
+      var select_box = document.getElementById("insecure_select")
+      if (checkBox.checked == true) {
+        text.disabled = false;
+        select_box.disabled = false;
+        text.hidden = false;
+        select_box.hidden = false;
+      } else {
+        text.disabled = true;
+        select_box.disabled = true;
+        text.hidden = true;
+        select_box.hidden = true;
+      }
+    };
 
-        function showSecure() {
-            var checkBox = document.getElementById("secure");
-            var text = document.getElementById("secure_text");
-            var select_box = document.getElementById("secure_select")
-            if (checkBox.checked == true) {
-                text.disabled = false;
-                select_box.disabled = false;
-                text.hidden = false;
-                select_box.hidden = false;
-            } else {
-                text.disabled = true;
-                select_box.disabled = true;
-                text.hidden = true;
-                select_box.hidden = true;
-            }
-        };
+    function showSecure() {
+      var checkBox = document.getElementById("secure");
+      var text = document.getElementById("secure_text");
+      var select_box = document.getElementById("secure_select")
+      if (checkBox.checked == true) {
+        text.disabled = false;
+        select_box.disabled = false;
+        text.hidden = false;
+        select_box.hidden = false;
+      } else {
+        text.disabled = true;
+        select_box.disabled = true;
+        text.hidden = true;
+        select_box.hidden = true;
+      }
+    };
 
-        function showAccessible() {
-            var checkBox = document.getElementById("accessible");
-            var text = document.getElementById("accessible_text");
-            var select_box = document.getElementById("accessible_select")
-            if (checkBox.checked == true) {
-                text.disabled = false;
-                select_box.disabled = false;
-                text.hidden = false;
-                select_box.hidden = false;
-            } else {
-                text.disabled = true;
-                select_box.disabled = true;
-                text.hidden = true;
-                select_box.hidden = true;
-            }
-        };
+    function showAccessible() {
+      var checkBox = document.getElementById("accessible");
+      var text = document.getElementById("accessible_text");
+      var select_box = document.getElementById("accessible_select")
+      if (checkBox.checked == true) {
+        text.disabled = false;
+        select_box.disabled = false;
+        text.hidden = false;
+        select_box.hidden = false;
+      } else {
+        text.disabled = true;
+        select_box.disabled = true;
+        text.hidden = true;
+        select_box.hidden = true;
+      }
+    };
 
 
-    </script>
+  </script>
 </body>
 
 
