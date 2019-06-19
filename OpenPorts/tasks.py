@@ -1,9 +1,7 @@
 from PortScanner.celery import app
 from celery.signals import worker_process_init
 
-from .models import Host, SecuredPort, OpenPort
-from .models import SecurePortResult, OpenPortResult
-from .models import Settings
+from .models import *
 
 from multiprocessing import current_process
 from random import randint
@@ -18,21 +16,36 @@ import jsonpickle as jp
 
 
 @app.task
-def scanLastHost(username):
-    last_host = Host.objects.filter(
-        added_by=User.objects.get(username=username)).last()
-    last_open_ports = OpenPort.objects.filter(
-        added_by=User.objects.get(username=username)).last()
-    last_secured_ports = SecuredPort.objects.filter(
-        added_by=User.objects.get(username=username)).last()
+def scanLastHost(username, host_id=0):
+    ScanStatus().save()
+
+    if host_id is 0:
+        last_host = Host.objects.filter(
+            added_by=User.objects.get(username=username)).last()
+        last_open_ports = OpenPort.objects.filter(
+            added_by=User.objects.get(username=username)).last()
+        last_secured_ports = SecuredPort.objects.filter(
+            added_by=User.objects.get(username=username)).last()
+    else:
+        last_host = Host.objects.filter(host_id=host_id,
+                                        added_by=User.objects.get(username=username)).last()
+        last_open_ports = OpenPort.objects.filter(host=Host.objects.get(host_id=host_id),
+                                                  added_by=User.objects.get(username=username)).last()
+        last_secured_ports = SecuredPort.objects.filter(host=Host.objects.get(host_id=host_id),
+                                                        added_by=User.objects.get(username=username)).last()
+
     last_settings = Settings.objects.filter().last()
 
     secure_proxy = last_host.secure_proxy_ip.split(":")[0]
     secure_port = int(last_host.secure_proxy_ip.split(":")[1])
     unsecure_proxy = last_host.unsecure_proxy_ip.split(":")[0]
     unsecure_port = int(last_host.unsecure_proxy_ip.split(":")[1])
-    open_ports = [int(x.strip())
-                  for x in last_open_ports.unsecured_ports.split(",")]
+
+    if len(last_open_ports.unsecured_ports) > 0:
+        open_ports = [int(x.strip())
+                      for x in last_open_ports.unsecured_ports.split(",")]
+    else:
+        open_ports = []
 
     mulScan_unsecuredPorts = MultiScan(targets=[last_host.ip],
                                        ports=open_ports,
@@ -41,6 +54,7 @@ def scanLastHost(username):
                                        proxy_ip=[secure_proxy, unsecure_proxy],
                                        proxy_port=[secure_port, unsecure_port])
 
+    stat = ScanStatus.objects.filter().last()
     open_port_res = dict(mulScan_unsecuredPorts.run_proxy_scan(False))
     open_res_write = OpenPortResult(
         added_by=User.objects.get(username=username),
@@ -55,8 +69,18 @@ def scanLastHost(username):
 
     open_res_write.save()
 
-    secured_ports = [int(x.strip())
-                     for x in last_secured_ports.secured_ports.split(",")]
+    ScanStatus.objects.update_or_create(
+        status_id=stat.status_id,
+        defaults={
+            'open_scan_status': True
+        })
+
+    if len(last_secured_ports.secured_ports) > 0:
+        secured_ports = [int(x.strip())
+                         for x in last_secured_ports.secured_ports.split(",")]
+    else:
+        secured_ports = []
+
     mulScan_securedPorts = MultiScan(targets=[last_host.ip],
                                      ports=secured_ports,
                                      threads=last_settings.threads,
@@ -86,6 +110,12 @@ def scanLastHost(username):
     )
 
     secure_res_write.save()
+
+    ScanStatus.objects.update_or_create(
+        status_id=stat.status_id,
+        defaults={
+            'secure_scan_status': True
+        })
 
 
 @app.task
@@ -151,11 +181,12 @@ def updateHostinDB(host_id, username, hostip, hostname,
         }
     )
 
-    scanLastHost(username)
+    scanLastHost(username, host_id)
 
 
 @app.task
 def scanSingleHost(user, last_host, last_open_ports, last_secured_ports, last_settings):
+    ScanStatus().save()
     user = jp.decode(user)
     last_host = jp.decode(last_host)
     last_open_ports = jp.decode(last_open_ports)
@@ -166,8 +197,12 @@ def scanSingleHost(user, last_host, last_open_ports, last_secured_ports, last_se
     secure_port = int(last_host.secure_proxy_ip.split(":")[1])
     unsecure_proxy = last_host.unsecure_proxy_ip.split(":")[0]
     unsecure_port = int(last_host.unsecure_proxy_ip.split(":")[1])
-    open_ports = [int(x.strip())
-                  for x in last_open_ports.unsecured_ports.split(",")]
+
+    if len(last_open_ports.unsecured_ports) > 0:
+        open_ports = [int(x.strip())
+                      for x in last_open_ports.unsecured_ports.split(",")]
+    else:
+        open_ports = []
 
     mulScan_unsecuredPorts = MultiScan(targets=[last_host.ip],
                                        ports=open_ports,
@@ -176,6 +211,8 @@ def scanSingleHost(user, last_host, last_open_ports, last_secured_ports, last_se
                                        proxy_ip=[secure_proxy,
                                                  unsecure_proxy],
                                        proxy_port=[secure_port, unsecure_port])
+
+    stat = ScanStatus.objects.filter().last()
 
     open_port_res = dict(mulScan_unsecuredPorts.run_proxy_scan(False))
     open_res_write = OpenPortResult(
@@ -192,8 +229,18 @@ def scanSingleHost(user, last_host, last_open_ports, last_secured_ports, last_se
 
     open_res_write.save()
 
-    secured_ports = [int(x.strip())
-                     for x in last_secured_ports.secured_ports.split(",")]
+    ScanStatus.objects.update_or_create(
+        status_id=stat.status_id,
+        defaults={
+            'open_scan_status': True
+        })
+
+    if len(last_secured_ports.secured_ports) > 0:
+        secured_ports = [int(x.strip())
+                         for x in last_secured_ports.secured_ports.split(",")]
+    else:
+        secure_port = []
+
     mulScan_securedPorts = MultiScan(targets=[last_host.ip],
                                      ports=secured_ports,
                                      threads=last_settings.threads,
@@ -225,6 +272,12 @@ def scanSingleHost(user, last_host, last_open_ports, last_secured_ports, last_se
     )
 
     secure_res_write.save()
+
+    ScanStatus.objects.update_or_create(
+        status_id=stat.status_id,
+        defaults={
+            'secure_scan_status': True
+        })
 
 
 @app.task

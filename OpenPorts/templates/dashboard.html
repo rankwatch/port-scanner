@@ -2,223 +2,125 @@
 <html lang="en">
 
 <head>
-  <title>Add Host</title>
+  <title>Dashboard</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"> -->
   <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css"
     integrity="sha256-BJ/G+e+y7bQdrYkS2RBTyNfBHpA9IuGaPmf9htub5MQ=" crossorigin="anonymous" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
 
 <body>
-
+  <div id="dashboard"></div>
   <div id="main" class="container">
     <div class="d-flex justify-content-center">
-      <div class="card col-sm-6">
+      <div class="card col-sm-12">
         <div class="card-body">
-          <form>
-            <fieldset>
-              <legend class="text-center lead">Host Address</legend>
-              <div class="form-group row">
-                <label for="hostip">IP</label>
-                {% if result.host_ip %}
-                <input type="text" class="form-control col-sm-12" name="hostip" id="hostip" value={{result.host_ip}}>
-                {% else %}
-                <input type="text" class="form-control col-sm-12" name="hostip" id="hostip">
-                {% endif %}
+          <div class="form-group row">
+            <div class="col-12">
+              <h4>Secured Vs Insecured Ports</h4>
+            </div>
+            <div class="col-12">
+              <label for="secure_progress" class="row d-flex justify-content-between">
+                <div class="col-sm-8 text-danger"><strong>{{totalOpenPorts}} Ports Open out of {{totalSecuredPorts}}
+                    Secured Ports!</strong></div>
+                <div class="col-sm-3">
+                  <span class="col badge badge-pill badge-info">{{lastSecureCheck}}</span>
+                </div>
+              </label>
+              <div id="secure_progress" class="progress">
+                <div class="progress-bar bg-danger" role="progressbar" style="width: {{percentSecure}}%"></div>
               </div>
-            </fieldset>
-            <fieldset>
-              <legend class="text-center lead">Host Details</legend>
-              <div class="form-group row">
-                <label for="hostname">Host Name</label>
-                {% if result.host_name %}
-                <input type="text" class="form-control col-sm-12" id="hostname" value={{result.host_name}}>
-                {% else %}
-                <input type="text" class="form-control col-sm-12" id="hostname">
-                {% endif %}
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-12">
+              <h4>Open Ports Accessibility</h4>
+            </div>
+            <div class="col-12">
+              <label for="secure_progress" class="row d-flex justify-content-between">
+                <div class="col-sm-8 text-danger"><strong>{{totalClosedPorts}} Ports Inaccessible out of
+                    {{totalPublicPorts}} Open Ports!</strong></div>
+                <div class="col-sm-3">
+                  <span class="col badge badge-pill badge-info">{{lastOpenCheck}}</span>
+                </div>
+              </label>
+              <div id="secure_progress" class="progress">
+                <div class="progress-bar bg-danger" role="progressbar" style="width: {{percentOpen}}%"></div>
               </div>
-              <div class="form-group row">
-                <label for="provider">Provider</label>
-                {% if result.provider %}
-                <input type="text" class="form-control col-sm-12" id="provider" value={{result.provider}}>
-                {% else %}
-                <input type="text" class="form-control col-sm-12" id="provider">
-                {% endif %}
-              </div>
-            </fieldset>
-          </form>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <br><br>
     <!-- <div class="container"> -->
-    <div class="d-flex justify-content-around card-group">
-      <div class="card col-md-5 col-12">
-        <div class="card-body ">
+    <div class="d-flex justify-content-around card-deck">
+      <div class="card col">
+        <div class="card-body">
           <form>
             <fieldset>
-              <legend class="text-center lead">Firewalled Ports</legend>
+              <legend class="font-weight-bold">
+                Insecured Hosts
+              </legend>
               <div class="form-group row">
-                {% if result.secure_proxy_ip %}
-                <label for="secure_ip_text" class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="secure_ip" onclick="myFunction()" checked>
-                  <label for="secure_ip" class="custom-control-label">Specify a secured proxy IP through which the
-                    following ports should be accessible</label>
-                </label>
-                <input type="text" class="form-control col-sm-12" id="secure_ip_text"
-                  placeholder="255.255.255.255:65536" value={{result.secure_proxy_ip}}>
-                {% else %}
-                <label for="secure_ip_text" class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="secure_ip" onclick="myFunction()">
-                  <label for="secure_ip" class="custom-control-label">Specify a secured proxy IP through which the
-                    following ports should be accessible</label>
-                </label>
-                <input type="text" class="form-control col-sm-12" id="secure_ip_text"
-                  placeholder="255.255.255.255:65536" disabled>
-                {% endif %}
-              </div>
-            </fieldset>
-            <fieldset>
-              <legend class="text-center lead">Add/Remove Ports</legend>
-              <div class="form-group row dropdown d-flex justify-content-between">
-                <button id="data-toggle-2" type="button" class="oi oi-plus btn btn-outline-success"
-                  data-toggle="dropdown"></button>
-                <div class="dropdown-menu">
-                  <div class="container">
-                    <input class="form-control dropdown-item" placeholder="Enter Port Number" type="text"
-                      id="text_secure_port">
-                    <input type="button" class="dropdown-item btn text-center btn-primary" value="Add"
-                      onclick="addSecuredPort()">
-                  </div>
-                </div>
-                <button type="button" class="oi oi-minus btn btn-outline-danger" onclick="removeSecuredPort()"></button>
-              </div>
-              <div class="form-group row">
-                {% if result.secure_ports %}
-                <select id="secure_port_list" multiple class="form-control bg-dark">
-                  <option class="list-group-item text-white bg-primary" disabled>Firewalled Ports</option>
-                  {% for i in result.secure_ports %}
-                  <option class="list-group-item text-white bg-primary small">{{i}}</option>
-                  {% endfor %}
-                </select>
-                {% else %}
-                <select id="secure_port_list" multiple class="form-control bg-dark">
-                  <option class="list-group-item text-white bg-primary" disabled>Firewalled Ports</option>
-                </select>
-                {% endif %}
+                <table class="table table-hover" style="width: 100%;">
+                  <thead>
+                    <tr>
+                      <th scope="col">Host</th>
+                      <th scope="col">Insecure From</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for k, v in insecuredHosts.items %}
+                    <tr class="table-dark">
+                      <th scope="row">{{k}}</th>
+                      <th>{{v}}</th>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
               </div>
             </fieldset>
           </form>
         </div>
       </div>
-      <div class="card col-md-5 col-12">
-        <div class="card-body ">
+      <div class="card col">
+        <div class="card-body">
           <form>
             <fieldset>
-              <legend class="text-center lead">Public Accessible Open Ports</legend>
+              <legend class="font-weight-bold">
+                Inaccessible Hosts
+              </legend>
               <div class="form-group row">
-                {% if result.unsecure_proxy_ip %}
-                <label for="unsecure_ip_text" class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="unsecure_ip" onclick="myFunction1()" checked>
-                  <label for="unsecure_ip" class="custom-control-label">Specify a blacklisted proxy IP through which the
-                    firewalled ports shouldn't be accessible but the open ports should be.</label>
-                </label>
-                <input type="text" class="form-control col-sm-12" id="unsecure_ip_text"
-                  placeholder="255.255.255.255:65536" value={{result.unsecure_proxy_ip}}>
-                {% else %}
-                <label for="unsecure_ip_text" class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="unsecure_ip" onclick="myFunction1()">
-                  <label for="unsecure_ip" class="custom-control-label">Specify a blacklisted proxy IP through which the
-                    firewalled ports shouldn't be accessible but the open ports should be.</label>
-                </label>
-                <input type="text" class="form-control col-sm-12" id="unsecure_ip_text"
-                  placeholder="255.255.255.255:65536" disabled>
-                {% endif %}
-              </div>
-            </fieldset>
-            <fieldset>
-              <legend class="text-center lead">Add/Remove Ports</legend>
-              <div class="form-group row dropdown d-flex justify-content-between">
-                <button id="data-toggle-1" type="button" class="oi oi-plus btn btn-outline-success"
-                  data-toggle="dropdown"></button>
-                <div class="dropdown-menu">
-                  <div class="container">
-                    <input class="form-control dropdown-item" placeholder="Enter Port Number" type="text"
-                      id="text_open_port">
-                    <input type="button" class="dropdown-item btn text-center btn-primary" value="Add"
-                      onclick="addOpenPort()">
-                  </div>
-                </div>
-                <button type="button" class="oi oi-minus btn btn-outline-danger" onclick="removeOpenPort()"></button>
-              </div>
-              <div class="form-group row">
-                {% if result.open_ports %}
-                <select id="open_port_list" multiple class="form-control bg-dark">
-                  <option class="list-group-item text-white bg-primary" disabled>Open Ports</option>
-                  {% for i in result.open_ports %}
-                  <option class="list-group-item text-white bg-primary small">{{i}}</option>
-                  {% endfor %}
-                </select>
-                {% else %}
-                <select id="open_port_list" multiple class="form-control bg-dark">
-                  <option class="list-group-item text-white bg-primary" disabled>Open Ports</option>
-                </select>
-                {% endif %}
+                <table class="table table-hover" style="width: 100%;">
+                  <thead>
+                    <tr>
+                      <th scope="col">Host</th>
+                      <th scope="col">Inaccessible Since</th>
+                    </tr>
+                  </thead>
+                  {% for k, v in inaccessibleHosts.items %}
+                    <tr class="table-dark">
+                      <th scope="row">{{k}}</th>
+                      <th>{{v}}</th>
+                    </tr>
+                    {% endfor %}
+                </table>
               </div>
             </fieldset>
           </form>
         </div>
       </div>
     </div>
-    <!-- </div> -->
-    <br><br>
-    <div class="container">
-      <div class="row d-flex justify-content-around">
-        {% if result %}
-        <a class="btn btn-primary col-sm-5" href="javascript:updateHost({{result.host_id}})">Update</a>
-        <a class="btn btn-primary col-sm-5" data-toggle="modal" data-target="#deleteModal">Delete</a>
-        {% else %}
-        <a id="saveHost" class="btn btn-primary col-sm-12" href="javascript:saveData()">Save</a>
-        {% endif %}
-      </div>
-    </div>
   </div>
 
-  <div id="deleteModal" class="modal fade" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title text-danger">Confirm Deletion</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p>Are you sure you want to delete this host?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary btn-danger" onclick='javascript:deleteHost({{result.host_id}});'
-            data-dismiss="modal">Delete
-            Host</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
   <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
-
-  <script>
-
-
-  </script>
 
 </body>
 

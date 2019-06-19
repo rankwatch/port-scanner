@@ -117,3 +117,20 @@ class OpenPortResult(models.Model):
 
     def __str__(self):
         return str(self.scanned_on) + " by " + str(self.added_by.username)
+
+
+class ScanStatus(models.Model):
+    status_id = models.IntegerField(primary_key=True)
+    secure_scan_status = models.BooleanField(default=False, blank=True)
+    open_scan_status = models.BooleanField(default=False, blank=True)
+
+    secure_scan_started_on = models.DateTimeField(default=datetime.now,
+                                                  blank=True)
+    open_scan_started_on = models.DateTimeField(default=datetime.now,
+                                                blank=True)
+
+    def publish(self):
+        self.save()
+
+    def __str__(self):
+        return str(self.status_id)

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Dashboard</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css"
+    integrity="sha256-BJ/G+e+y7bQdrYkS2RBTyNfBHpA9IuGaPmf9htub5MQ=" crossorigin="anonymous" />
+</head>
+
+<body>
+  <div id="scanreport"></div>
+  <div id="main" class="container">
+    <div class="card col-sm-12">
+      <div class="card-body">
+        <div class="form-group row">
+          <div class="col-12">
+            <h4>Secure Ports Scan Report</h4>
+          </div>
+          <div class="col-12">
+            {% if secureScanStatus %}
+            <label for="secure_progress" class="row">
+              <div class="col-sm-12">Status: <strong>Finished!</strong></div>
+            </label>
+            <div id="secure_progress" class="progress">
+              <div class="progress-bar bg-success" role="progressbar" style="width: 100%">
+              </div>
+            </div>
+            {% else %}
+            <label for="secure_progress_anim" class="row">
+              <div class="col-sm-12">Status: <strong>Running!</strong></div>
+            </label>
+            <div id="secure_progress_anim" class="progress">
+              <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar"
+                style="width: 1%">
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="row d-flex justify-content-between">
+          <div class="col">
+            <p>
+              Scan Started {{secureScanTime}}
+            </p>
+          </div>
+          <div class="col d-flex justify-content-end">
+            <a href="javascript:loadSecuredPortReport()" class="text-light">
+              View Past Reports <span class="oi oi-chevron-right small"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br><br>
+    <div class="card col-sm-12">
+      <div class="card-body">
+        <div class="form-group row">
+          <div class="col-12">
+            <h4>Open Port Scan Report</h4>
+          </div>
+          <div class="col-12">
+            {% if openScanStatus %}
+            <label for="open_progress" class="row">
+              <div class="col-sm-12">Status: <strong>Finished!</strong></div>
+            </label>
+            <div id="open_progress" class="progress">
+              <div class="progress-bar bg-success" role="progressbar" style="width: 100%">
+              </div>
+            </div>
+            {% else %}
+            <label for="open_progress" class="row">
+              <div class="col-sm-12">Status: <strong>Running!</strong></div>
+            </label>
+            <div id="open_progress" class="progress">
+              <div class="progress-bar bg-success" role="progressbar" style="width: 1%">
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="row d-flex justify-content-between">
+          <div class="col">
+            <p>
+              Scan Started {{openScanTime}}
+            </p>
+          </div>
+          <div class="col d-flex justify-content-end">
+            <a href="javascript:loadOpenPortReport()" class="text-light">
+              View Past Reports <span class="oi oi-chevron-right small"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+
+  <script>
+
+    function move() {
+      var elem = document.getElementById("#secure_progress_anim");
+      var width = 1;
+      var id = setInterval(frame, 10);
+      function frame() {
+        if (width >= 100) {
+          clearInterval(id);
+        } else {
+          width = width + 0.01;
+          elem.style.width = width + '%';
+        }
+      }
+    }
+
+  </script>
+
+</body>
+
+</html>

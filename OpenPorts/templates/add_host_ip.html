@@ -16,7 +16,7 @@
 
   <div id="main" class="container">
     <div class="d-flex justify-content-center">
-      <div class="card col-sm-6">
+      <div class="card col-sm-12">
         <div class="card-body">
           <form>
             <fieldset>
@@ -55,131 +55,131 @@
     </div>
     <br><br>
     <!-- <div class="container"> -->
-    <div class="d-flex justify-content-around card-group">
-      <div class="card col-md-5 col-12">
-        <div class="card-body ">
-          <form>
-            <fieldset>
-              <legend class="text-center lead">Firewalled Ports</legend>
-              <div class="form-group row">
-                {% if result.secure_proxy_ip %}
-                <label for="secure_ip_text" class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="secure_ip" onclick="myFunction()" checked>
-                  <label for="secure_ip" class="custom-control-label">Specify a secured proxy IP through which the
-                    following ports should be accessible</label>
-                </label>
-                <input type="text" class="form-control col-sm-12" id="secure_ip_text"
-                  placeholder="255.255.255.255:65536" value={{result.secure_proxy_ip}}>
-                {% else %}
-                <label for="secure_ip_text" class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="secure_ip" onclick="myFunction()">
-                  <label for="secure_ip" class="custom-control-label">Specify a secured proxy IP through which the
-                    following ports should be accessible</label>
-                </label>
-                <input type="text" class="form-control col-sm-12" id="secure_ip_text"
-                  placeholder="255.255.255.255:65536" disabled>
-                {% endif %}
-              </div>
-            </fieldset>
-            <fieldset>
-              <legend class="text-center lead">Add/Remove Ports</legend>
-              <div class="form-group row dropdown d-flex justify-content-between">
-                <button id="data-toggle-2" type="button" class="oi oi-plus btn btn-outline-success"
-                  data-toggle="dropdown"></button>
-                <div class="dropdown-menu">
-                  <div class="container">
-                    <input class="form-control dropdown-item" placeholder="Enter Port Number" type="text"
-                      id="text_secure_port">
-                    <input type="button" class="dropdown-item btn text-center btn-primary" value="Add"
-                      onclick="addSecuredPort()">
-                  </div>
+    <div class="d-flex justify-content-around card-deck">
+        <div class="card col">
+          <div class="card-body ">
+            <form>
+              <fieldset>
+                <legend class="text-center lead">Firewalled Ports</legend>
+                <div class="form-group row">
+                  {% if result.secure_proxy_ip %}
+                  <label for="secure_ip_text" class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="secure_ip" onclick="myFunction()" checked>
+                    <label for="secure_ip" class="custom-control-label">Specify a secured proxy IP through which the
+                      following ports should be accessible</label>
+                  </label>
+                  <input type="text" class="form-control col-sm-12" id="secure_ip_text"
+                    placeholder="255.255.255.255:65536" value={{result.secure_proxy_ip}}>
+                  {% else %}
+                  <label for="secure_ip_text" class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="secure_ip" onclick="myFunction()">
+                    <label for="secure_ip" class="custom-control-label">Specify a secured proxy IP through which the
+                      following ports should be accessible</label>
+                  </label>
+                  <input type="text" class="form-control col-sm-12" id="secure_ip_text"
+                    placeholder="255.255.255.255:65536" disabled>
+                  {% endif %}
                 </div>
-                <button type="button" class="oi oi-minus btn btn-outline-danger" onclick="removeSecuredPort()"></button>
-              </div>
-              <div class="form-group row">
-                {% if result.secure_ports %}
-                <select id="secure_port_list" multiple class="form-control bg-dark">
-                  <option class="list-group-item text-white bg-primary" disabled>Firewalled Ports</option>
-                  {% for i in result.secure_ports %}
-                  <option class="list-group-item text-white bg-primary small">{{i}}</option>
-                  {% endfor %}
-                </select>
-                {% else %}
-                <select id="secure_port_list" multiple class="form-control bg-dark">
-                  <option class="list-group-item text-white bg-primary" disabled>Firewalled Ports</option>
-                </select>
-                {% endif %}
-              </div>
-            </fieldset>
-          </form>
-        </div>
-      </div>
-      <div class="card col-md-5 col-12">
-        <div class="card-body ">
-          <form>
-            <fieldset>
-              <legend class="text-center lead">Public Accessible Open Ports</legend>
-              <div class="form-group row">
-                {% if result.unsecure_proxy_ip %}
-                <label for="unsecure_ip_text" class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="unsecure_ip" onclick="myFunction1()" checked>
-                  <label for="unsecure_ip" class="custom-control-label">Specify a blacklisted proxy IP through which the
-                    firewalled ports shouldn't be accessible but the open ports should be.</label>
-                </label>
-                <input type="text" class="form-control col-sm-12" id="unsecure_ip_text"
-                  placeholder="255.255.255.255:65536" value={{result.unsecure_proxy_ip}}>
-                {% else %}
-                <label for="unsecure_ip_text" class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="unsecure_ip" onclick="myFunction1()">
-                  <label for="unsecure_ip" class="custom-control-label">Specify a blacklisted proxy IP through which the
-                    firewalled ports shouldn't be accessible but the open ports should be.</label>
-                </label>
-                <input type="text" class="form-control col-sm-12" id="unsecure_ip_text"
-                  placeholder="255.255.255.255:65536" disabled>
-                {% endif %}
-              </div>
-            </fieldset>
-            <fieldset>
-              <legend class="text-center lead">Add/Remove Ports</legend>
-              <div class="form-group row dropdown d-flex justify-content-between">
-                <button id="data-toggle-1" type="button" class="oi oi-plus btn btn-outline-success"
-                  data-toggle="dropdown"></button>
-                <div class="dropdown-menu">
-                  <div class="container">
-                    <input class="form-control dropdown-item" placeholder="Enter Port Number" type="text"
-                      id="text_open_port">
-                    <input type="button" class="dropdown-item btn text-center btn-primary" value="Add"
-                      onclick="addOpenPort()">
+              </fieldset>
+              <fieldset>
+                <legend class="text-center lead">Add/Remove Ports</legend>
+                <div class="form-group row dropdown d-flex justify-content-between">
+                  <button id="data-toggle-2" type="button" class="oi oi-plus btn btn-outline-success"
+                    data-toggle="dropdown"></button>
+                  <div class="dropdown-menu">
+                    <div class="container">
+                      <input class="form-control dropdown-item" placeholder="Enter Port Number" type="text"
+                        id="text_secure_port">
+                      <input type="button" class="dropdown-item btn text-center btn-primary" value="Add"
+                        onclick="addSecuredPort()">
+                    </div>
                   </div>
+                  <button type="button" class="oi oi-minus btn btn-outline-danger" onclick="removeSecuredPort()"></button>
                 </div>
-                <button type="button" class="oi oi-minus btn btn-outline-danger" onclick="removeOpenPort()"></button>
-              </div>
-              <div class="form-group row">
-                {% if result.open_ports %}
-                <select id="open_port_list" multiple class="form-control bg-dark">
-                  <option class="list-group-item text-white bg-primary" disabled>Open Ports</option>
-                  {% for i in result.open_ports %}
-                  <option class="list-group-item text-white bg-primary small">{{i}}</option>
-                  {% endfor %}
-                </select>
-                {% else %}
-                <select id="open_port_list" multiple class="form-control bg-dark">
-                  <option class="list-group-item text-white bg-primary" disabled>Open Ports</option>
-                </select>
-                {% endif %}
-              </div>
-            </fieldset>
-          </form>
+                <div class="form-group row">
+                  {% if result.secure_ports %}
+                  <select id="secure_port_list" multiple class="form-control bg-dark">
+                    <option class="list-group-item text-white bg-primary" disabled>Firewalled Ports</option>
+                    {% for i in result.secure_ports %}
+                    <option class="list-group-item text-white bg-primary small">{{i}}</option>
+                    {% endfor %}
+                  </select>
+                  {% else %}
+                  <select id="secure_port_list" multiple class="form-control bg-dark">
+                    <option class="list-group-item text-white bg-primary" disabled>Firewalled Ports</option>
+                  </select>
+                  {% endif %}
+                </div>
+              </fieldset>
+            </form>
+          </div>
         </div>
-      </div>
+        <div class="card col">
+          <div class="card-body ">
+            <form>
+              <fieldset>
+                <legend class="text-center lead">Public Accessible Open Ports</legend>
+                <div class="form-group row">
+                  {% if result.unsecure_proxy_ip %}
+                  <label for="unsecure_ip_text" class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="unsecure_ip" onclick="myFunction1()" checked>
+                    <label for="unsecure_ip" class="custom-control-label">Specify a blacklisted proxy IP through which the
+                      firewalled ports shouldn't be accessible but the open ports should be.</label>
+                  </label>
+                  <input type="text" class="form-control col-sm-12" id="unsecure_ip_text"
+                    placeholder="255.255.255.255:65536" value={{result.unsecure_proxy_ip}}>
+                  {% else %}
+                  <label for="unsecure_ip_text" class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="unsecure_ip" onclick="myFunction1()">
+                    <label for="unsecure_ip" class="custom-control-label">Specify a blacklisted proxy IP through which the
+                      firewalled ports shouldn't be accessible but the open ports should be.</label>
+                  </label>
+                  <input type="text" class="form-control col-sm-12" id="unsecure_ip_text"
+                    placeholder="255.255.255.255:65536" disabled>
+                  {% endif %}
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend class="text-center lead">Add/Remove Ports</legend>
+                <div class="form-group row dropdown d-flex justify-content-between">
+                  <button id="data-toggle-1" type="button" class="oi oi-plus btn btn-outline-success"
+                    data-toggle="dropdown"></button>
+                  <div class="dropdown-menu">
+                    <div class="container">
+                      <input class="form-control dropdown-item" placeholder="Enter Port Number" type="text"
+                        id="text_open_port">
+                      <input type="button" class="dropdown-item btn text-center btn-primary" value="Add"
+                        onclick="addOpenPort()">
+                    </div>
+                  </div>
+                  <button type="button" class="oi oi-minus btn btn-outline-danger" onclick="removeOpenPort()"></button>
+                </div>
+                <div class="form-group row">
+                  {% if result.open_ports %}
+                  <select id="open_port_list" multiple class="form-control bg-dark">
+                    <option class="list-group-item text-white bg-primary" disabled>Open Ports</option>
+                    {% for i in result.open_ports %}
+                    <option class="list-group-item text-white bg-primary small">{{i}}</option>
+                    {% endfor %}
+                  </select>
+                  {% else %}
+                  <select id="open_port_list" multiple class="form-control bg-dark">
+                    <option class="list-group-item text-white bg-primary" disabled>Open Ports</option>
+                  </select>
+                  {% endif %}
+                </div>
+              </fieldset>
+            </form>
+          </div>
+        </div>
     </div>
     <!-- </div> -->
-    <br><br>
+    <br>
     <div class="container">
       <div class="row d-flex justify-content-around">
         {% if result %}
-        <a class="btn btn-primary col-sm-5" href="javascript:updateHost({{result.host_id}})">Update</a>
-        <a class="btn btn-primary col-sm-5" data-toggle="modal" data-target="#deleteModal">Delete</a>
+        <a class="btn btn-primary btn-block" href="javascript:updateHost({{result.host_id}})">Update</a>
+        <a class="btn btn-primary btn-block" data-toggle="modal" data-target="#deleteModal">Delete</a>
         {% else %}
         <a id="saveHost" class="btn btn-primary col-sm-12" href="javascript:saveData()">Save</a>
         {% endif %}
@@ -212,7 +212,6 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-
   <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
 
