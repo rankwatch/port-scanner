@@ -1054,7 +1054,7 @@ def add_filters_secured(request):
     data = []
     for i in res:
         data.append(res[i])
-    return render(request, "secure_port.html", {"secure_filters": res,
+    return render(request, "secure_port_report.html", {"secure_filters": res,
                                                 "filters": filters,
                                                 "csv": str(data)})
 
@@ -1215,7 +1215,7 @@ def add_filters_opened(request):
     data = []
     for i in res:
         data.append(res[i])
-    return render(request, "open_port.html", {"secure_filters": res,
+    return render(request, "open_port_report.html", {"secure_filters": res,
                                               "filters": filters,
                                               "csv": str(data)})
 
