@@ -13,6 +13,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 
 import jsonpickle as jp
+import ast
 
 
 @app.task
@@ -47,12 +48,14 @@ def scanLastHost(username, host_id=0):
     else:
         open_ports = []
 
-    mulScan_unsecuredPorts = MultiScan(targets=[last_host.ip],
-                                       ports=open_ports,
-                                       threads=last_settings.threads,
-                                       timeout=last_settings.timeout,
-                                       proxy_ip=[secure_proxy, unsecure_proxy],
-                                       proxy_port=[secure_port, unsecure_port])
+    mulScan_unsecuredPorts = MultiScan(
+        targets=[last_host.ip],
+        ports=open_ports,
+        threads=last_settings.threads,
+        timeout=last_settings.timeout,
+        proxy_ip=[secure_proxy, unsecure_proxy],
+        proxy_port=[secure_port, unsecure_port]
+    )
 
     stat = ScanStatus.objects.filter().last()
     open_port_res = dict(mulScan_unsecuredPorts.run_proxy_scan(False))
@@ -115,44 +118,109 @@ def scanLastHost(username, host_id=0):
         status_id=stat.status_id,
         defaults={
             'secure_scan_status': True
-        })
+        }
+    )
+
+
+@app.task
+def fullScanLastHost(username, host_id):
+    FullScanStatus(
+        host=Host.objects.get(host_id=host_id)
+    ).save()
+
+    last_host = Host.objects.filter(
+        host_id=host_id,
+        added_by=User.objects.get(username=username)
+    ).last()
+
+    last_open_ports = OpenPort.objects.filter(
+        host=Host.objects.get(host_id=host_id),
+        added_by=User.objects.get(username=username)
+    ).last()
+
+    last_secured_ports = SecuredPort.objects.filter(
+        host=Host.objects.get(host_id=host_id),
+        added_by=User.objects.get(username=username)
+    ).last()
+
+    last_settings = Settings.objects.filter().last()
+
+    fullScan = MultiScan(
+        targets=[last_host.ip],
+        ports=range(65536),
+        threads=last_settings.threads,
+        timeout=last_settings.timeout
+    )
+
+    stat = FullScanStatus.objects.filter().last()
+    full_scan_res = dict(fullScan.run_full_scan())
+
+    full_scan_res_write = FullScanResult(
+        added_by=User.objects.get(username=username),
+        host=Host.objects.get(host_id=host_id),
+        open_ports=', '.join(
+            [str(x) for x in full_scan_res[last_host.ip]['Opened Ports']]
+        ),
+        close_ports=', '.join(
+            [str(x) for x in full_scan_res[last_host.ip]['Closed Ports']]
+        ),
+        runtime=full_scan_res[last_host.ip]['Runtime']
+    )
+
+    full_scan_res_write.save()
+
+    FullScanStatus.objects.update_or_create(
+        status_id=stat.status_id,
+        defaults={
+            'scan_status': True
+        }
+    )
 
 
 @app.task
 def addHostToDB(username, hostip, hostname, provider,
-                secure_ports, open_ports,
+                secure_ports, open_ports, full_scan_flag,
                 secure_proxy, unsecure_proxy):
 
     user = User.objects.get(username=username)
-    host = Host(ip=hostip, added_by=user, secure_proxy_ip=secure_proxy,
-                unsecure_proxy_ip=unsecure_proxy, added_on=datetime.now(),
-                modified_on=datetime.now(), host_name=hostname,
-                provider=provider)
+    host = Host(
+        ip=hostip, added_by=user, secure_proxy_ip=secure_proxy,
+        unsecure_proxy_ip=unsecure_proxy, added_on=datetime.now(),
+        modified_on=datetime.now(), host_name=hostname,
+        provider=provider,
+        full_scan_flag=ast.literal_eval(full_scan_flag.title())
+    )
 
     host.save()
 
     host_primary_key = Host.objects.filter(
         ip=hostip,
-        added_by=User.objects.get(username=username)).last().host_id
+        added_by=User.objects.get(username=username)
+    ).last().host_id
 
-    sp = SecuredPort(added_by=user,
-                     host=Host.objects.get(host_id=host_primary_key),
-                     secured_ports=", ".join(secure_ports.split("::")[1:-1]))
+    sp = SecuredPort(
+        added_by=user,
+        host=Host.objects.get(host_id=host_primary_key),
+        secured_ports=", ".join(secure_ports.split("::")[1:-1])
+    )
 
-    up = OpenPort(added_by=user,
-                  host=Host.objects.get(host_id=host_primary_key),
-                  unsecured_ports=", ".join(open_ports.split("::")[1:-1]))
+    up = OpenPort(
+        added_by=user,
+        host=Host.objects.get(host_id=host_primary_key),
+        unsecured_ports=", ".join(open_ports.split("::")[1:-1])
+    )
 
     sp.save()
     up.save()
 
     scanLastHost(username)
+    fullScanLastHost(username, host_primary_key)
 
 
 @app.task
 def updateHostinDB(host_id, username, hostip, hostname,
-                   provider, secure_ports, open_ports,
-                   secure_proxy, unsecure_proxy):
+                   provider, full_scan_flag, secure_ports,
+                   open_ports, secure_proxy, unsecure_proxy):
 
     obj, created = Host.objects.update_or_create(
         host_id=host_id,
@@ -160,9 +228,10 @@ def updateHostinDB(host_id, username, hostip, hostname,
             'host_ip': hostip,
             'host_name': hostname,
             'provider': provider,
+            'full_scan_flag': ast.literal_eval(full_scan_flag.title()),
             'secure_proxy_ip': secure_proxy,
             'unsecure_proxy_ip': unsecure_proxy
-        },
+        }
     )
 
     obj_1, created_1 = SecuredPort.objects.update_or_create(
