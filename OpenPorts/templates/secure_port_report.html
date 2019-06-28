@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Secured Port Report</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <br>
+    <div class="row">
+      <div class="col-sm-9">
+        <table class="table table-hover" id="securePortTable" style="width:100%;">
+          <thead>
+            <tr>
+              <th scope="col">Id</th>
+              <th scope="col">Host</th>
+              <th scope="col">Port</th>
+              <th scope="col">Is Secured</th>
+              <th scope="col">Last Breach On</th>
+              <th scope="col">Last Checked On</th>
+              <th scope="col">Insecure</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            {% if secure %}
+            {% for k, v in secure.items %}
+
+            <tr class="table-primary">
+              <th scope="row">{{k}}</th>
+              <th scope="row">{{v.ip}}</th>
+              <td>{{v.port}}</td>
+              <td>{{v.issecured}}</td>
+              <td>{{v.lastbreach}}</td>
+              <td>{{v.lastchecked}}</td>
+              <td>{{v.insecure}}</td>
+            </tr>
+
+            {% endfor %}
+            {% else %}
+            {% for k, v in secure_filters.items %}
+
+            <tr class="table-primary">
+              <th scope="row">{{k}}</th>
+              <th scope="row">{{v.ip}}</th>
+              <td>{{v.port}}</td>
+              <td>{{v.issecured}}</td>
+              <td>{{v.lastbreach}}</td>
+              <td>{{v.lastchecked}}</td>
+              <td>{{v.insecure}}</td>
+            </tr>
+
+            {% endfor %}
+            {% endif %}
+
+          </tbody>
+        </table>
+      </div>
+
+      {% if filters %}
+      <div class="col-sm-3">
+        <form class="p-1">
+          <fieldset>
+            <legend class="text-center lead">Filters</legend>
+            <div class="form-group row">
+              <textarea class="form-control" rows="4" name="text" placeholder="IP/Host to filter seprated by (,)"
+                id="ips">{{filters.ips}}</textarea>
+            </div>
+            {% if filters.secured == "true" %}
+            <div class="form-group row text-success custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check1" checked>
+              <label class="custom-control-label" for="check1">Secured</label>
+            </div>
+            {% else %}
+            <div class="form-group row text-success custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check1">
+              <label class="custom-control-label" for="check1">Secured</label>
+            </div>
+            {% endif %}
+
+            {% if filters.insecured == "true" %}
+            <div class="form-group row text-danger custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check2" checked>
+              <label class="custom-control-label" for="check2">Insecured</label>
+            </div>
+            {% else %}
+            <div class="form-group row text-danger custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check2">
+              <label class="custom-control-label" for="check2">Insecured</label>
+            </div>
+            {% endif %}
+
+            {% if filters.insecure == "true" %}
+            <div class="form-group row">
+              <label for="insecure_select" class="custom-control custom-checkbox col-12">
+                <input type="checkbox" class="custom-control-input" onclick='javascript:showInsecure();' id="insecure"
+                  checked>
+                <label class="custom-control-label" for="insecure">Insecure</label>
+              </label>
+              <select class="form-control form-control-sm col-8" id="insecure_select">
+                {% if filters.insecure_select == "More Than" %}
+                <option class="list-group-item text-white bg-dark" selected>More Than
+                </option>
+                {% else %}
+                <option class="list-group-item text-white bg-dark">More Than
+                </option>
+                {% endif %}
+                {% if filters.insecure_select == "Less Than" %}
+                <option class="list-group-item text-white bg-dark" selected>Less Than
+                </option>
+                {% else %}
+                <option class="list-group-item text-white bg-dark">Less Than
+                </option>
+                {% endif %}
+                {% if filters.insecure_select == "Equal To" %}
+                <option class="list-group-item text-white bg-dark" selected>Equal To
+                </option>
+                {% else %}
+                <option class="list-group-item text-white bg-dark">Equal To
+                </option>
+                {% endif %}
+              </select>
+              <input class="form-control form-control-sm offset-1 col-3" type="text" id="insecure_text"
+                value={{filters.insecure_text}}>
+            </div>
+            {% else %}
+
+            <div class="form-group row">
+              <label for="insecure_select" class="custom-control custom-checkbox col-12">
+                <input type="checkbox" class="custom-control-input" onclick='javascript:showInsecure();' id="insecure">
+                <label class="custom-control-label" for="insecure">Insecure</label>
+              </label>
+              <select class="form-control form-control-sm col-8" id="insecure_select" disabled hidden>
+                <option class="list-group-item text-white bg-dark">More Than
+                </option>
+                <option class="list-group-item text-white bg-dark">Less Than
+                </option>
+                <option class="list-group-item text-white bg-dark">Equal To
+                </option>
+              </select>
+              <input class="form-control form-control-sm offset-1 col-3" type="text" id="insecure_text" disabled hidden>
+            </div>
+            {% endif %}
+
+
+            <div class="form-group row d-flex justify-content-center">
+              <a class="btn btn-primary btn-block" href="javascript:filterResultsSecure();">Apply
+                Filter</a>
+            </div>
+            <div class="form-group row d-flex justify-content-center">
+              <a class="btn btn-primary btn-block"
+                href="javascript:JSONToCSVConvertor({{csv}}, 'SecurePortReport', true);">Export to CSV</a>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+      {% else %}
+      <div class="col-sm-3">
+        <form class="p-1">
+          <fieldset>
+            <legend class="text-center lead">Filters</legend>
+            <div class="form-group row">
+              <textarea class="form-control" rows="4" name="text" placeholder="IP/Host to filter seprated by (,)"
+                id="ips"></textarea>
+            </div>
+            <div class="form-group row text-success custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check1">
+              <label class="custom-control-label" for="check1">Secured</label>
+            </div>
+            <div class="form-group row text-danger custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check2">
+              <label class="custom-control-label" for="check2">Insecured</label>
+            </div>
+            <div class="form-group row">
+              <label for="insecure_select" class="custom-control custom-checkbox col-12">
+                <input type="checkbox" class="custom-control-input" onclick='javascript:showInsecure();' id="insecure">
+                <label class="custom-control-label" for="insecure"># Insecure</label>
+              </label>
+              <select class="form-control form-control-sm col-8" id="insecure_select" disabled hidden>
+                <option class="list-group-item text-white bg-dark">More Than
+                </option>
+                <option class="list-group-item text-white bg-dark">Less Than
+                </option>
+                <option class="list-group-item text-white bg-dark">Equal To
+                </option>
+              </select>
+              <input class="form-control form-control-sm offset-1 col-3" type="text" id="insecure_text" disabled hidden>
+            </div>
+
+            <div class="form-group row d-flex justify-content-center">
+              <a class="btn btn-primary btn-block" href="javascript:filterResultsSecure();">Apply
+                Filter</a>
+            </div>
+            <div class="form-group row d-flex justify-content-center">
+              <a class="btn btn-primary btn-block"
+                href="javascript:JSONToCSVConvertor({{csv}}, 'SecurePortReport', true);">Export to CSV</a>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+
+  <script>
+
+  </script>
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+  <script>
+
+    $(document).ready(function () {
+      var table = $('#securePortTable').DataTable({ "scrollX": true });
+    });
+
+    function filterResultsSecure(result) {
+      var ips = document.getElementById("ips").value;
+      var secured = "false";
+      var insecured = "false";
+      var insecure_1 = "";
+      if (document.getElementById("check1").checked == true) {
+        secured = 'true';
+      }
+      if (document.getElementById("check2").checked == true) {
+        insecured = 'true';
+      }
+      if (document.getElementById("insecure").checked == true) {
+        insecure_1 = document.getElementById("insecure_text").value;
+        if (insecure_1.length > 0) {
+          var value1 = parseInt(insecure_1, 10);
+          if (value1 >= 0 && value1 <= 65536) {
+            insecure_1 = document.getElementById("insecure_select").value + ":" + document.getElementById("insecure_text").value + ":" + "true";
+
+          }
+          else {
+            alert("Wrong Value");
+          }
+        }
+        else {
+          alert("Insecure field can't be Null");
+        }
+      }
+
+
+      $.ajax({
+        type: "GET",
+        url: document.URL + "/add_filters_secured",
+        dataType: 'html',
+        data: {
+          "ips": ips,
+          "secured": secured,
+          "insecured": insecured,
+          "insecure_1": insecure_1
+        },
+        success: function (data) {
+          if (data) {
+            console.log(document.URL);
+            $("#results").html(data);
+          }
+          else {
+            $("#results").html('<div class="container">\
+                        <div class="alert alert-danger alert-dismissible">\
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                        <strong>Oops!</strong> Something went wrong!\
+                        </div></div>');
+          }
+        }
+      });
+    }
+
+    function showInsecure() {
+      var checkBox = document.getElementById("insecure");
+      var text = document.getElementById("insecure_text");
+      var select_box = document.getElementById("insecure_select")
+      if (checkBox.checked == true) {
+        text.disabled = false;
+        select_box.disabled = false;
+        text.hidden = false;
+        select_box.hidden = false;
+      } else {
+        text.disabled = true;
+        select_box.disabled = true;
+        text.hidden = true;
+        select_box.hidden = true;
+      }
+    };
+
+    function JSONToCSVConvertor(JSONData, ReportTitle, ShowLabel) {
+      //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
+      var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
+
+      var CSV = '';
+      //Set Report title in first row or line
+
+      // CSV += ReportTitle + '\r\n\n';
+
+      //This condition will generate the Label/Header
+      if (ShowLabel) {
+        var row = "";
+
+        //This loop will extract the label from 1st index of on array
+        for (var index in arrData[0]) {
+
+          //Now convert each value to string and comma-seprated
+          row += index + ',';
+        }
+
+        row = row.slice(0, -1);
+
+        //append Label row with line break
+        CSV += row + '\r\n';
+      }
+
+      //1st loop is to extract each row
+      for (var i = 0; i < arrData.length; i++) {
+        var row = "";
+
+        //2nd loop will extract each column and convert it in string comma-seprated
+        for (var index in arrData[i]) {
+          row += '"' + arrData[i][index] + '",';
+        }
+
+        row.slice(0, row.length - 1);
+
+        //add a line break after each row
+        CSV += row + '\r\n';
+      }
+
+      if (CSV == '') {
+        alert("Invalid data");
+        return;
+      }
+
+      //Generate a file name
+      var fileName = "";
+      //this will remove the blank-spaces from the title and replace it with an underscore
+      fileName += ReportTitle.replace(/ /g, "_");
+
+      //Initialize file format you want csv or xls
+      var uri = 'data:text/csv;charset=utf-8,' + escape(CSV);
+
+      // Now the little tricky part.
+      // you can use either>> window.open(uri);
+      // but this will not work in some browsers
+      // or you will not get the correct file extension    
+
+      //this trick will generate a temp <a /> tag
+      var link = document.createElement("a");
+      link.href = uri;
+
+      //set the visibility hidden so it will not effect on your web-layout
+      link.style = "visibility:hidden";
+      link.download = fileName + ".csv";
+
+      //this part will append the anchor tag and remove it after automatic click
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+
+
+  </script>
+</body>
+
+
+</html>

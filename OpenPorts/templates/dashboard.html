@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Dashboard</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css"
+    integrity="sha256-BJ/G+e+y7bQdrYkS2RBTyNfBHpA9IuGaPmf9htub5MQ=" crossorigin="anonymous" />
+</head>
+
+<body>
+  <div id="dashboard"></div>
+  <div id="main" class="container">
+    <div class="d-flex justify-content-center">
+      <div class="card col-sm-12">
+        <div class="card-body">
+          <div class="form-group row">
+            <div class="col-12">
+              <h4>Secured Vs Insecured Ports</h4>
+            </div>
+            <div class="col-12">
+              <label for="secure_progress" class="row d-flex justify-content-between">
+                <div class="col-sm-8 text-danger"><strong>{{totalOpenPorts}} Ports Open out of {{totalSecuredPorts}}
+                    Secured Ports!</strong></div>
+                <div class="col-sm-3">
+                  <span class="col badge badge-pill badge-info">{{lastSecureCheck}}</span>
+                </div>
+              </label>
+              <div id="secure_progress" class="progress">
+                <div class="progress-bar bg-danger" role="progressbar" style="width: {{percentSecure}}%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-12">
+              <h4>Open Ports Accessibility</h4>
+            </div>
+            <div class="col-12">
+              <label for="secure_progress" class="row d-flex justify-content-between">
+                <div class="col-sm-8 text-danger"><strong>{{totalClosedPorts}} Ports Inaccessible out of
+                    {{totalPublicPorts}} Open Ports!</strong></div>
+                <div class="col-sm-3">
+                  <span class="col badge badge-pill badge-info">{{lastOpenCheck}}</span>
+                </div>
+              </label>
+              <div id="secure_progress" class="progress">
+                <div class="progress-bar bg-danger" role="progressbar" style="width: {{percentOpen}}%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br><br>
+    <!-- <div class="container"> -->
+    <div class="d-flex justify-content-around card-deck">
+      <div class="card col">
+        <div class="card-body">
+          <form>
+            <fieldset>
+              <legend class="font-weight-bold">
+                Insecured Hosts
+              </legend>
+              <div class="form-group row">
+                <table class="table table-hover" style="width: 100%;">
+                  <thead>
+                    <tr>
+                      <th scope="col">Host</th>
+                      <th scope="col">Insecure From</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for k, v in insecuredHosts.items %}
+                    <tr class="table-dark">
+                      <th scope="row">{{k}}</th>
+                      <th>{{v}}</th>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+      <div class="card col">
+        <div class="card-body">
+          <form>
+            <fieldset>
+              <legend class="font-weight-bold">
+                Inaccessible Hosts
+              </legend>
+              <div class="form-group row">
+                <table class="table table-hover" style="width: 100%;">
+                  <thead>
+                    <tr>
+                      <th scope="col">Host</th>
+                      <th scope="col">Inaccessible Since</th>
+                    </tr>
+                  </thead>
+                  {% for k, v in inaccessibleHosts.items %}
+                    <tr class="table-dark">
+                      <th scope="row">{{k}}</th>
+                      <th>{{v}}</th>
+                    </tr>
+                    {% endfor %}
+                </table>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+
+</body>
+
+</html>

@@ -1,7 +1,12 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+*/*.pyc
+*.pyc
+*/__pycache__/
+*/__pycache__
 *.py[cod]
 *$py.class
+
 
 # C extensions
 *.so
@@ -105,6 +110,13 @@ venv.bak/
 
 # vscode
 .vscode
+.*
+.*/
 
-# UWSGI ini
-PortScanner_UWSGI.ini
+# Celery Beat
+celery-beat-schedule
+
+# Database
+db.*
+*/migrations/
+migrations/
