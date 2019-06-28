@@ -95,6 +95,7 @@ def addnewhost(request):
                       request.GET.get('provider'),
                       request.GET.get('secure_ports'),
                       request.GET.get('open_ports'),
+                      request.GET.get('full_scan_flag'),
                       secure_proxy,
                       unsecure_proxy)
 
@@ -263,6 +264,7 @@ def editHost(request):
         "host_ip": host.ip,
         "host_name": host.host_name,
         "provider": host.provider,
+        "full_scan_flag": host.full_scan_flag,
         "secure_proxy_ip": host.secure_proxy_ip,
         "unsecure_proxy_ip": host.unsecure_proxy_ip,
         "open_ports": [str(x.strip()) for x in op.unsecured_ports.split(",")],
@@ -374,6 +376,7 @@ def updateHost(request):
                          request.GET.get('host_ip'),
                          request.GET.get('hostname'),
                          request.GET.get('provider'),
+                         request.GET.get('full_scan_flag'),
                          request.GET.get('secure_ports'),
                          request.GET.get('open_ports'),
                          secure_proxy,
@@ -1295,7 +1298,6 @@ def add_filters_opened(request):
 
         except Exception as e:
             print("\n123", e, "\n")
-
     if len(ips) > 0:
         ip_list = [str(x).strip() for x in ips.split(",")]
         res = filter_ip_opened(res, ip_list)

@@ -17,6 +17,12 @@ app.conf.beat_schedule = {
         'task': 'OpenPorts.tasks.scanAllHosts',
         # 'schedule': crontab(minute="*/"+str(Settings.objects.filter().last().schedule))
         'schedule': crontab()
+    },
+    'Full_Scan_All_Hosts': {
+        'task': 'OpenPorts.tasks.fullScanAllHosts',
+        'schedule': crontab(hour=9,
+                            minute=0,
+                            day_of_week="*")
     }
 }
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)

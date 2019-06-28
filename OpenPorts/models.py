@@ -23,6 +23,8 @@ class Host(models.Model):
 
     provider = models.CharField(max_length=255)
 
+    full_scan_flag = models.BooleanField(default=False)
+
     def publish(self):
         self.save()
 
@@ -134,3 +136,38 @@ class ScanStatus(models.Model):
 
     def __str__(self):
         return str(self.status_id)
+
+
+class FullScanStatus(models.Model):
+    status_id = models.IntegerField(primary_key=True)
+    scan_status = models.BooleanField(default=False, blank=True)
+    started_on = models.DateTimeField(
+        default=datetime.now,
+        blank=True
+    )
+
+    host = models.ForeignKey(Host, on_delete=models.CASCADE)
+
+    def publish(self):
+        self.save()
+
+    def __str__(self):
+        return str(self.status_id)
+
+
+class FullScanResult(models.Model):
+    scan_id = models.IntegerField(primary_key=True)
+
+    host = models.ForeignKey(Host, on_delete=models.CASCADE)
+    added_by = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    open_ports = models.TextField()
+    close_ports = models.TextField()
+
+    runtime = models.CharField(max_length=255)
+
+    def publish(self):
+        self.save()
+
+    def __str__(self):
+        return "Scan - " + str(self.scan_id)
