@@ -2,101 +2,506 @@
 <html lang="en">
 
 <head>
-  <title>Bootstrap Example</title>
+  <title>Add Host</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"> -->
+  <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css"
     integrity="sha256-BJ/G+e+y7bQdrYkS2RBTyNfBHpA9IuGaPmf9htub5MQ=" crossorigin="anonymous" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
 
 <body>
 
-  <div>
+  <div id="main" class="container">
     <div class="d-flex justify-content-center">
-      <div class="card  col-sm-6 bg-light" style="outline: solid 1px;">
-        <div class="card-title">Add Host</div>
+      <div class="card col-sm-12">
         <div class="card-body">
-          <input type="text" id="hostip" class="form-control">
+          <form>
+            <fieldset>
+              <legend class="text-center lead">Host Address</legend>
+              <div class="form-group row">
+                <label for="hostip">IP</label>
+                {% if result.host_ip %}
+                <input type="text" class="form-control col-sm-12" name="hostip" id="hostip" value={{result.host_ip}}>
+                {% else %}
+                <input type="text" class="form-control col-sm-12" name="hostip" id="hostip">
+                {% endif %}
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend class="text-center lead">Host Details</legend>
+              <div class="form-group row">
+                <label for="hostname">Host Name</label>
+                {% if result.host_name %}
+                <input type="text" class="form-control col-sm-12" id="hostname" value={{result.host_name}}>
+                {% else %}
+                <input type="text" class="form-control col-sm-12" id="hostname">
+                {% endif %}
+              </div>
+              <div class="form-group row">
+                <label for="provider">Provider</label>
+                {% if result.provider %}
+                <input type="text" class="form-control col-sm-12" id="provider" value={{result.provider}}>
+                {% else %}
+                <input type="text" class="form-control col-sm-12" id="provider">
+                {% endif %}
+              </div>
+            </fieldset>
+          </form>
         </div>
       </div>
     </div>
     <br><br>
-    <div class="d-flex justify-content-around card-group">
-      <div class="card col-sm-5 h-100 bg-light" style="outline: solid 1px;">
-        <div class="card-title">Secured Ports</div>
-        <div class="card-body ">
-          <div class="row small">
-            <div class="col-sm-5">
-              <input type="checkbox" id="secure_ip" onclick="myFunction()">&nbsp;&nbsp;Specify Secured Proxy IP:
-            </div>
-            <div class="col-sm-7">
-              <input type="text" class="form-control h-75" id="secure_ip_text" placeholder="192.x.x.x:port"
-                disabled="true">
-            </div>
-          </div>
-          <div class="row dropdown d-flex justify-content-end">
-            <button id="data-toggle-2" type="button" class="oi oi-plus btn btn-light" data-toggle="dropdown"></button>
-            <!-- Add Secured Port -->
-            <!-- </button> -->
-            <div class="dropdown-menu" style="padding: 4%;">
-              <input class="form-control dropdown-item" placeholder="Port Number" type="text" id="text_secure_port"><br>
-              <input type="submit" class="form-control dropdown-item bg-primary" onclick="javascript:addSecuredPort()">
-            </div>
-            <button type="button" class="oi oi-minus btn btn-light" onclick="removeSecuredPort()"></button><br>
-          </div>
-          <div class="row" style="padding-top: 1%;">
-            <select id="secure_port_list" multiple class="form-control">
-              <option class="list-group-item" disabled>Secure Ports</option>
-            </select>
-
+    <!-- <div class="container"> -->
+    <div class="d-flex justify-content-around card-deck">
+        <div class="card col">
+          <div class="card-body ">
+            <form>
+              <fieldset>
+                <legend class="text-center lead">Firewalled Ports</legend>
+                <div class="form-group row">
+                  {% if result.secure_proxy_ip %}
+                  <label for="secure_ip_text" class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="secure_ip" onclick="myFunction()" checked>
+                    <label for="secure_ip" class="custom-control-label">Specify a secured proxy IP through which the
+                      following ports should be accessible</label>
+                  </label>
+                  <input type="text" class="form-control col-sm-12" id="secure_ip_text"
+                    placeholder="255.255.255.255:65536" value={{result.secure_proxy_ip}}>
+                  {% else %}
+                  <label for="secure_ip_text" class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="secure_ip" onclick="myFunction()">
+                    <label for="secure_ip" class="custom-control-label">Specify a secured proxy IP through which the
+                      following ports should be accessible</label>
+                  </label>
+                  <input type="text" class="form-control col-sm-12" id="secure_ip_text"
+                    placeholder="255.255.255.255:65536" disabled>
+                  {% endif %}
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend class="text-center lead">Add/Remove Ports</legend>
+                <div class="form-group row dropdown d-flex justify-content-between">
+                  <button id="data-toggle-2" type="button" class="oi oi-plus btn btn-outline-success"
+                    data-toggle="dropdown"></button>
+                  <div class="dropdown-menu">
+                    <div class="container">
+                      <input class="form-control dropdown-item" placeholder="Enter Port Number" type="text"
+                        id="text_secure_port">
+                      <input type="button" class="dropdown-item btn text-center btn-primary" value="Add"
+                        onclick="addSecuredPort()">
+                    </div>
+                  </div>
+                  <button type="button" class="oi oi-minus btn btn-outline-danger" onclick="removeSecuredPort()"></button>
+                </div>
+                <div class="form-group row">
+                  {% if result.secure_ports %}
+                  <select id="secure_port_list" multiple class="form-control bg-dark">
+                    <option class="list-group-item text-white bg-primary" disabled>Firewalled Ports</option>
+                    {% for i in result.secure_ports %}
+                    <option class="list-group-item text-white bg-primary small">{{i}}</option>
+                    {% endfor %}
+                  </select>
+                  {% else %}
+                  <select id="secure_port_list" multiple class="form-control bg-dark">
+                    <option class="list-group-item text-white bg-primary" disabled>Firewalled Ports</option>
+                  </select>
+                  {% endif %}
+                </div>
+              </fieldset>
+            </form>
           </div>
         </div>
-      </div>
-      <div class="card col-sm-5 h-100 bg-light" style="outline: solid 1px;">
-        <div class="card-title">Open Ports</div>
-        <div class="card-body ">
-          <div class="row small">
-            <div class="col-sm-5">
-              <input type="checkbox" id="unsecure_ip" onclick="myFunction1()">&nbsp;&nbsp;Specify Unsecure Proxy IP:
-            </div>
-            <div class="col-sm-7">
-              <input type="text" class="form-control h-75" id="unsecure_ip_text" placeholder="192.x.x.x:port"
-                disabled="true">
-            </div>
+        <div class="card col">
+          <div class="card-body ">
+            <form>
+              <fieldset>
+                <legend class="text-center lead">Public Accessible Open Ports</legend>
+                <div class="form-group row">
+                  {% if result.unsecure_proxy_ip %}
+                  <label for="unsecure_ip_text" class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="unsecure_ip" onclick="myFunction1()" checked>
+                    <label for="unsecure_ip" class="custom-control-label">Specify a blacklisted proxy IP through which the
+                      firewalled ports shouldn't be accessible but the open ports should be.</label>
+                  </label>
+                  <input type="text" class="form-control col-sm-12" id="unsecure_ip_text"
+                    placeholder="255.255.255.255:65536" value={{result.unsecure_proxy_ip}}>
+                  {% else %}
+                  <label for="unsecure_ip_text" class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="unsecure_ip" onclick="myFunction1()">
+                    <label for="unsecure_ip" class="custom-control-label">Specify a blacklisted proxy IP through which the
+                      firewalled ports shouldn't be accessible but the open ports should be.</label>
+                  </label>
+                  <input type="text" class="form-control col-sm-12" id="unsecure_ip_text"
+                    placeholder="255.255.255.255:65536" disabled>
+                  {% endif %}
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend class="text-center lead">Add/Remove Ports</legend>
+                <div class="form-group row dropdown d-flex justify-content-between">
+                  <button id="data-toggle-1" type="button" class="oi oi-plus btn btn-outline-success"
+                    data-toggle="dropdown"></button>
+                  <div class="dropdown-menu">
+                    <div class="container">
+                      <input class="form-control dropdown-item" placeholder="Enter Port Number" type="text"
+                        id="text_open_port">
+                      <input type="button" class="dropdown-item btn text-center btn-primary" value="Add"
+                        onclick="addOpenPort()">
+                    </div>
+                  </div>
+                  <button type="button" class="oi oi-minus btn btn-outline-danger" onclick="removeOpenPort()"></button>
+                </div>
+                <div class="form-group row">
+                  {% if result.open_ports %}
+                  <select id="open_port_list" multiple class="form-control bg-dark">
+                    <option class="list-group-item text-white bg-primary" disabled>Open Ports</option>
+                    {% for i in result.open_ports %}
+                    <option class="list-group-item text-white bg-primary small">{{i}}</option>
+                    {% endfor %}
+                  </select>
+                  {% else %}
+                  <select id="open_port_list" multiple class="form-control bg-dark">
+                    <option class="list-group-item text-white bg-primary" disabled>Open Ports</option>
+                  </select>
+                  {% endif %}
+                </div>
+              </fieldset>
+            </form>
           </div>
-          <div class="row dropdown d-flex justify-content-end">
-            <button id="data-toggle-1" type="button" class="oi oi-plus btn btn-light"
-              data-toggle="dropdown"></button><br>
-            <!-- Add Open Port -->
-            <!-- </button> -->
-            <div class="dropdown-menu" style="padding:4%;">
-              <input class="form-control dropdown-item" placeholder="Port Number" type="text" id="text_open_port"><br>
-              <input type="submit" class="form-control dropdown-item bg-primary" id="add_open_port"
-                onclick="javascript:addOpenPort()">
-            </div>
-            <button type="button" class="oi oi-minus btn btn-light" onclick="removeOpenPort()"></button><br>
-          </div>
-          <div class="row" style="padding-top: 1%;">
-            <select id="open_port_list" multiple class="form-control">
-              <option class="list-group-item" disabled>Open Ports</option>
-            </select>
-
-          </div>
-
         </div>
-      </div>
-
     </div>
-    <div class="d-flex justify-content-center row" style="padding-top: 3%;">
-      <a class="btn btn-primary" href="javascript:saveData()">Save</a>
+    <!-- </div> -->
+    <br>
+    <div class="container">
+      <div class="row d-flex justify-content-around">
+        {% if result %}
+        <a class="btn btn-primary btn-block" href="javascript:updateHost({{result.host_id}})">Update</a>
+        <a class="btn btn-primary btn-block" data-toggle="modal" data-target="#deleteModal">Delete</a>
+        {% else %}
+        <a id="saveHost" class="btn btn-primary col-sm-12" href="javascript:saveData()">Save</a>
+        {% endif %}
+      </div>
     </div>
   </div>
 
+  <div id="deleteModal" class="modal fade" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-danger">Confirm Deletion</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete this host?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary btn-danger" onclick='javascript:deleteHost({{result.host_id}});'
+            data-dismiss="modal">Delete
+            Host</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+
+  <script>
+
+    document.getElementById("secure_ip_text").oninput = function (e) {
+      if (validateIpAndPort(this.value)) {
+        this.className = "form-control col-sm-12 is-valid";
+        document.getElementById("save").className = "form-control btn btn-primary btn-block";
+      } else {
+        this.className = "form-control col-sm-12 is-invalid";
+        document.getElementById("save").className = "form-control btn btn-primary btn-block disabled";
+      }
+    }
+
+    document.getElementById("unsecure_ip_text").oninput = function (e) {
+      if (validateIpAndPort(this.value)) {
+        this.className = "form-control col-sm-12 is-valid";
+        document.getElementById("save").className = "form-control btn btn-primary btn-block";
+      } else {
+        this.className = "form-control col-sm-12 is-invalid";
+        document.getElementById("save").className = "form-control btn btn-primary btn-block disabled";
+      }
+    }
+
+    function validateIpAndPort(input) {
+      var parts = input.split(":");
+      var ip = parts[0].split(".");
+      var port = parts[1];
+      return validateNum(port, 1, 65535) && ip.length == 4 && ip.every(function (segment) {
+        return validateNum(segment, 0, 255);
+      });
+    }
+
+    document.getElementById("hostip").oninput = function (e) {
+      if (validateIp(this.value)) {
+        this.className = "form-control col-sm-12 is-valid";
+        document.getElementById("saveHost").className = "form-control btn btn-primary btn-block";
+      } else {
+        this.className = "form-control col-sm-12 is-invalid";
+        document.getElementById("saveHost").className = "form-control btn btn-primary btn-block disabled";
+      }
+    }
+
+    function validateIp(input) {
+      var parts = input.split(":");
+      var ip = parts[0].split(".");
+      return ip.length == 4 && ip.every(function (segment) {
+        return validateNum(segment, 0, 255);
+      });
+    }
+
+    function validateNum(input, min, max) {
+      var num = +input;
+      return num >= min && num <= max && input === num.toString();
+    }
+
+
+    function deleteHost(host_id) {
+
+      console.log("Deleting Host " + host_id);
+
+      $.ajax({
+
+        type: 'GET',
+        url: document.URL + "/deleteHost",
+        data: {
+          'host_id': host_id
+        },
+        dataType: 'html',
+        success: function (data) {
+          if (data) {
+            $('#main').html('<div class="container">\
+                                <div class="alert alert-success alert-dismissible">\
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                                <strong>Success!</strong> Host Deleted.\
+                                </div></div>');
+          }
+        }
+      });
+
+    };
+
+    function updateHost(host_id) {
+
+      var hostip = document.getElementById("hostip").value;
+      var hostname = document.getElementById("hostname").value;
+      var provider = document.getElementById("provider").value;
+      var secure_proxy = "";
+      var unsecure_proxy = "";
+      var secure_ports_list = document.getElementById("secure_port_list");
+      var open_port_list = document.getElementById("open_port_list");
+
+      if (secure_ip.checked) {
+        secure_proxy = document.getElementById("secure_ip_text").value;
+      }
+
+      if (unsecure_ip.checked) {
+        unsecure_proxy = document.getElementById("unsecure_ip_text").value;
+      }
+
+      var sp_string = "";
+      var op_string = "";
+
+      var i;
+
+      for (i = 0; i < secure_ports_list.length; i++) {
+        sp_string = sp_string + secure_ports_list.options[i].text + "::";
+      }
+
+      for (i = 0; i < open_port_list.length; i++) {
+        op_string = op_string + open_port_list.options[i].text + "::";
+      }
+
+      $.ajax({
+
+        type: "GET",
+        url: document.URL + "/updateHost",
+        data: {
+          'host_id': host_id,
+          'host_ip': hostip,
+          'hostname': hostname,
+          'provider': provider,
+          'secure_ports': sp_string,
+          'open_ports': op_string,
+          'secure_proxy': secure_proxy,
+          'unsecure_proxy': unsecure_proxy
+        },
+        dataType: 'html',
+        success: function (data) {
+          if (data) {
+            $('#results').html('<div class="container">\
+          <div class="alert alert-success alert-dismissible">\
+          <button type="button" class="close" data-dismiss="alert">&times;</button>\
+          <strong>Success!</strong> Host Updated and Scan Initiated!.\
+          </div></div>');
+          }
+          else {
+            $('#results').html('<div class="container">\
+          <div class="alert alert-danger alert-dismissible">\
+          <button type="button" class="close" data-dismiss="alert">&times;</button>\
+          <strong>Oops!</strong> Something went wrong!.\
+          </div></div>');
+          }
+        }
+
+      });
+
+    };
+
+    function addOpenPort() {
+      var port = document.getElementById("text_open_port").value;
+      document.getElementById("text_open_port").value = "";
+      if (port.length > 0) {
+        var value1 = parseInt(port, 10);
+        if (value1 > 0 && value1 <= 65536) {
+          // console.log(value1);
+          var node = document.createElement("OPTION");
+          node.className = "list-group-item text-white bg-primary small";
+          node.appendChild(document.createTextNode(value1));
+          document.getElementById("open_port_list").appendChild(node);
+        }
+        else {
+          alert("Wrong Port Number");
+        }
+      }
+      else {
+        alert("Port Number can't be Null");
+      }
+    };
+
+    function addSecuredPort() {
+      var port = document.getElementById("text_secure_port").value;
+      document.getElementById("text_secure_port").value = "";
+      if (port.length > 0) {
+        var value1 = parseInt(port, 10);
+        if (value1 > 0 && value1 <= 65536) {
+          // console.log(value1);
+          var node = document.createElement("OPTION");
+          node.className = "list-group-item text-white bg-primary small";
+          node.appendChild(document.createTextNode(value1));
+          document.getElementById("secure_port_list").appendChild(node);
+        }
+        else {
+          alert("Wrong Port Number");
+        }
+      }
+      else {
+        alert("Port Number can't be Null");
+      }
+    };
+
+    function removeOpenPort() {
+      var x = document.getElementById("open_port_list");
+      x.remove(x.selectedIndex);
+    };
+
+    function removeSecuredPort() {
+      var y = document.getElementById("secure_port_list");
+      y.remove(y.selectedIndex);
+    };
+
+    function myFunction() {
+      var checkBox = document.getElementById("secure_ip");
+      var text = document.getElementById("secure_ip_text");
+      if (checkBox.checked == true) {
+        text.disabled = false;
+      } else {
+        text.disabled = true;
+      }
+    };
+
+    function myFunction1() {
+      var checkBox = document.getElementById("unsecure_ip");
+      var text = document.getElementById("unsecure_ip_text");
+      if (checkBox.checked == true) {
+        text.disabled = false;
+      } else {
+        text.disabled = true;
+      }
+    };
+
+    function saveData() {
+
+      var hostip = document.getElementById("hostip").value;
+      var hostname = document.getElementById("hostname").value;
+      var provider = document.getElementById("provider").value;
+      var secure_proxy = "";
+      var unsecure_proxy = "";
+      var secure_ports_list = document.getElementById("secure_port_list");
+      var open_port_list = document.getElementById("open_port_list");
+
+      if (secure_ip.checked) {
+        secure_proxy = document.getElementById("secure_ip_text").value;
+      }
+
+      if (unsecure_ip.checked) {
+        unsecure_proxy = document.getElementById("unsecure_ip_text").value;
+      }
+
+      var sp_string = "";
+      var op_string = "";
+
+      var i;
+
+      for (i = 0; i < secure_ports_list.length; i++) {
+        sp_string = sp_string + secure_ports_list.options[i].text + "::";
+      }
+
+      for (i = 0; i < open_port_list.length; i++) {
+        op_string = op_string + open_port_list.options[i].text + "::";
+      }
+
+      $.ajax({
+
+        type: "GET",
+        url: document.URL + "/addnewhost",
+        data: {
+          'host_ip': hostip,
+          'hostname': hostname,
+          'provider': provider,
+          'secure_ports': sp_string,
+          'open_ports': op_string,
+          'secure_proxy': secure_proxy,
+          'unsecure_proxy': unsecure_proxy
+        },
+        dataType: 'html',
+        success: function (data) {
+          if (data) {
+            $('#results').html('<div class="container">\
+                <div class="alert alert-success alert-dismissible">\
+                <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                <strong>Success!</strong> Host Added and Scan Initiated!.\
+                </div></div>');
+          }
+          else {
+            $('#results').html('<div class="container">\
+                <div class="alert alert-danger alert-dismissible">\
+                <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                <strong>Alert!</strong> Something went wrong!.\
+                </div></div>');
+          }
+        }
+
+      });
+
+    };
+
+
+  </script>
 
 </body>
 
