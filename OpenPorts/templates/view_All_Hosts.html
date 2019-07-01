@@ -43,7 +43,7 @@
               <td>{{v.inaccessible}}</td>
               <td>{{v.status}}</td>
               <td>
-                <a href="javascript:void(0)" class="text-white">View Report</a> |
+                <a href="javascript:viewReport({{k}})" class="text-white">View Report</a> |
                 <a href="javascript:editHost({{k}})" class="text-white">Edit</a>
               </td>
             </tr>
@@ -61,7 +61,7 @@
               <td>{{v.inaccessible}}</td>
               <td>{{v.status}}</td>
               <td>
-                <a href="javascript:void(0)" class="text-white">View Report</a> |
+                <a href="javascript:viewReport({{k}})" class="text-white">View Report</a> |
                 <a href="javascript:editHost({{k}})" class="text-white">Edit</a>
               </td>
             </tr>
@@ -448,6 +448,28 @@
       });
     };
 
+    function viewReport(host_id) {
+
+      $.ajax({
+        type: 'GET',
+        url: document.URL + '/viewReport',
+        data: {
+          'host_id': host_id
+        },
+        dataType: 'html',
+        success: function (data) {
+          if (data) {
+            $("#results").html(data);
+          } else {
+            $('#results').html('<div class="container">\
+                <div class="alert alert-danger alert-dismissible">\
+                <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                <strong>Alert!</strong> Something went wrong!.\
+                </div></div>');
+          }
+        }
+      });
+    };
     function showInaccessible() {
       var checkBox = document.getElementById("inaccessible");
       var text = document.getElementById("inaccessible_text");

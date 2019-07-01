@@ -273,6 +273,72 @@ def editHost(request):
     return render(request, "add_host_ip.html", {"result": host_dic})
 
 
+@login_required
+def viewReport(request):
+    host = Host.objects.get(host_id=request.GET.get("host_id"))
+    sec = SecuredPort.objects.get(host=host)
+    op = OpenPort.objects.get(host=host)
+    sec_res = SecurePortResult.objects.filter(host=host).last()
+    op_res = OpenPortResult.objects.filter(host=host).last()
+    if len(sec_res.secure_open_ports) > 0:
+        secure = [int(x.strip()) for x in sec_res.secure_open_ports.split(",")]
+    else:
+        secure = []
+
+    if len(sec_res.unsecure_open_ports) > 0:
+        unsecure = [int(x.strip()) for x in sec_res.unsecure_open_ports.split(",")]
+    else:
+        unsecure = []
+
+    if len(op_res.open_ports) > 0:
+        open = [int(x.strip()) for x in op_res.open_ports.split(",")]
+    else:
+        open = []
+
+    res = {}
+    i = 0
+    if len(sec.secured_ports) > 0:
+        secure_port = [int(x.strip()) for x in sec.secured_ports.split(",")]
+    else:
+        secure_port = []
+    
+    if len(op.unsecured_ports) > 0:
+        open_port = [int(x.strip()) for x in op.unsecured_ports.split(",")]
+    else:
+        open_port = []
+
+    for port in secure_port:
+        dat = {}
+        if port in secure:
+            dat["host"] = host
+            dat["port"] = port
+            dat["status"] = "Secured"
+        elif port in unsecure:
+            dat["host"] = host
+            dat["port"] = port
+            dat["status"] = "Unsecured"
+        else:
+            dat["host"] = host
+            dat["port"] = port
+            dat["status"] = "Inaccessible"
+        res[i] = dat
+        i+=1
+    for port in open_port:
+        dat = {}
+        if port in open:
+            dat["host"] = host
+            dat["port"] = port
+            dat["status"] = "Open"
+        else:
+            dat["host"] = host
+            dat["port"] = port
+            dat["status"] = "Inaccessible"
+        res[i] = dat
+        i+=1
+    return render(request, "view_report.html" , {"result" : res, "host_id":request.GET.get("host_id")})
+
+
+
 def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -448,22 +514,35 @@ def timeconvert(sec):
 @login_required
 def loadScanReport(request):
     tz = pytz.timezone("Asia/Calcutta")
-
+    
     stat = ScanStatus.objects.filter().last()
+    try:
+        secure_scan_time = timeconvert(
+            (tz.localize(datetime.now()) - stat.secure_scan_started_on).total_seconds())
+    except:
+        secure_scan_time = 0
 
-    secure_scan_time = timeconvert(
-        (tz.localize(datetime.now()) - stat.secure_scan_started_on).total_seconds())
+    try:
+        open_scan_time = timeconvert(
+            (tz.localize(datetime.now()) - stat.open_scan_started_on).total_seconds())
+    except:
+        open_scan_time = 0
 
-    open_scan_time = timeconvert(
-        (tz.localize(datetime.now()) - stat.open_scan_started_on).total_seconds())
-
-    context = {
-        'secureScanStatus': stat.secure_scan_status,
-        'openScanStatus': stat.open_scan_status,
-        'secureScanTime': secure_scan_time,
-        'openScanTime': open_scan_time
-    }
-    return render(request, 'scanreport.html', context)
+    
+    try:
+        context = {
+            'secureScanStatus': stat.secure_scan_status,
+            'openScanStatus': stat.open_scan_status,
+            'secureScanTime': secure_scan_time,
+            'openScanTime': open_scan_time
+        }
+        return render(request, 'scanreport.html', context)
+    except:
+        return HttpResponse('<div class="container">\
+                                <div class="alert alert-danger alert-dismissible">\
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                                <strong>Oops!</strong> No Host Added!\
+                                </div></div>')
 
 
 @login_required
@@ -477,73 +556,76 @@ def securePortReport(request):
     for host in hosts:
         try:
             print("\n"*3, host.host_id, "\n")
-            secure_res = SecurePortResult.objects.filter(
-                host=Host.objects.get(host_id=host.host_id)).last()
+            secure_res_all = SecurePortResult.objects.filter(
+                host=Host.objects.get(host_id=host.host_id))
             secure = SecuredPort.objects.filter(
                 host=Host.objects.get(host_id=host.host_id)).last()
             ports = [int(x.strip()) for x in secure.secured_ports.split(",")]
-            try:
-                secureports = [int(x.strip())
-                               for x in secure_res.secure_open_ports.split(",")]
-            except:
-                secureports = []
+            
+            for secure_res in secure_res_all:
+                try:
+                    secureports = [int(x.strip())
+                                for x in secure_res.secure_open_ports.split(",")]
+                except:
+                    secureports = []
 
-            try:
-                unsecureports = [int(x.strip())
-                                 for x in secure_res.unsecure_open_ports.split(",")]
-            except:
-                unsecureports = []
+                try:
+                    unsecureports = [int(x.strip())
+                                    for x in secure_res.unsecure_open_ports.split(",")]
+                except:
+                    unsecureports = []
 
-            try:
-                secureclosedports = [int(x.strip())
-                                     for x in secure_res.secure_closed_ports.split(",")]
-            except:
-                secureclosedports = []
+                try:
+                    secureclosedports = [int(x.strip())
+                                        for x in secure_res.secure_closed_ports.split(",")]
+                except:
+                    secureclosedports = []
 
-            # print("\n", time.time()-(time.mktime(t.timetuple()) + t.microsecond/1E6), "\n")
-            secureports = list(set(secureports)-set(unsecureports))
-            for port in ports:
-                host_dic = {}
-                if port in secureports:
-                    tz = pytz.timezone("Asia/Calcutta")
-                    t = secure_res.scanned_on
-                    host_dic["ip"] = host.ip
-                    host_dic["port"] = port
-                    host_dic["issecured"] = 1
-                    host_dic["lastchecked"] = timeconvert(
-                        (tz.localize(datetime.now()) - secure_res.scanned_on).total_seconds())
-                    host_dic["insecure"] = len(unsecureports)
-                    host_dic["lastbreach"] = lastBreach(host, port, True)
-                    res[i] = host_dic
-                    i += 1
-                elif port in unsecureports:
-                    tz = pytz.timezone("Asia/Calcutta")
-                    t = secure_res.scanned_on
-                    host_dic["ip"] = host.ip
-                    host_dic["port"] = port
-                    host_dic["issecured"] = 0
-                    host_dic["lastbreach"] = "None"
-                    host_dic["lastchecked"] = timeconvert(
-                        (tz.localize(datetime.now()) - secure_res.scanned_on).total_seconds())
-                    host_dic["insecure"] = len(unsecureports)
-                    res[i] = host_dic
-                    i += 1
-                elif port in secureclosedports:
-                    tz = pytz.timezone("Asia/Calcutta")
-                    t = secure_res.scanned_on
-                    host_dic["ip"] = host.ip
-                    host_dic["port"] = port
-                    host_dic["issecured"] = 2
-                    host_dic["lastbreach"] = "None"
-                    host_dic["lastchecked"] = timeconvert(
-                        (tz.localize(datetime.now()) - secure_res.scanned_on).total_seconds())
-                    host_dic["insecure"] = len(unsecureports)
-                    res[i] = host_dic
-                    i += 1
+                # print("\n", time.time()-(time.mktime(t.timetuple()) + t.microsecond/1E6), "\n")
+                secureports = list(set(secureports)-set(unsecureports))
+                for port in ports:
+                    host_dic = {}
+                    if port in secureports:
+                        tz = pytz.timezone("Asia/Calcutta")
+                        t = secure_res.scanned_on
+                        host_dic["ip"] = host.ip
+                        host_dic["port"] = port
+                        host_dic["issecured"] = 1
+                        host_dic["lastchecked"] = timeconvert(
+                            (tz.localize(datetime.now()) - secure_res.scanned_on).total_seconds())
+                        host_dic["insecure"] = len(unsecureports)
+                        host_dic["lastbreach"] = lastBreach(host, port, True)
+                        res[i] = host_dic
+                        i += 1
+                    elif port in unsecureports:
+                        tz = pytz.timezone("Asia/Calcutta")
+                        t = secure_res.scanned_on
+                        host_dic["ip"] = host.ip
+                        host_dic["port"] = port
+                        host_dic["issecured"] = 0
+                        host_dic["lastbreach"] = "None"
+                        host_dic["lastchecked"] = timeconvert(
+                            (tz.localize(datetime.now()) - secure_res.scanned_on).total_seconds())
+                        host_dic["insecure"] = len(unsecureports)
+                        res[i] = host_dic
+                        i += 1
+                    elif port in secureclosedports:
+                        tz = pytz.timezone("Asia/Calcutta")
+                        t = secure_res.scanned_on
+                        host_dic["ip"] = host.ip
+                        host_dic["port"] = port
+                        host_dic["issecured"] = 2
+                        host_dic["lastbreach"] = "None"
+                        host_dic["lastchecked"] = timeconvert(
+                            (tz.localize(datetime.now()) - secure_res.scanned_on).total_seconds())
+                        host_dic["insecure"] = len(unsecureports)
+                    if bool(host_dic):
+                        res[i] = host_dic
+                        i += 1
 
         except Exception as e:
             print("\n", e, "\n")
-
+    
     data = []
     for i in res:
         data.append(res[i])
@@ -562,56 +644,59 @@ def openPortReport(request):
     for host in hosts:
         try:
             print("\n"*3, host.host_id, "\n")
-            open_res = OpenPortResult.objects.filter(
-                host=Host.objects.get(host_id=host.host_id)).last()
+            open_res_all = OpenPortResult.objects.filter(
+                host=Host.objects.get(host_id=host.host_id))
             open1 = OpenPort.objects.filter(
                 host=Host.objects.get(host_id=host.host_id)).last()
             ports = [int(x.strip()) for x in open1.unsecured_ports.split(",")]
-            try:
-                openports = [int(x.strip())
-                             for x in open_res.open_ports.split(",")]
-            except:
-                openports = []
+            for open_res in open_res_all:
+                try:
+                    openports = [int(x.strip())
+                                for x in open_res.open_ports.split(",")]
+                except:
+                    openports = []
 
-            try:
-                closedports = [int(x.strip())
-                               for x in open_res.closed_ports.split(",")]
-            except:
-                closedports = []
+                try:
+                    closedports = [int(x.strip())
+                                for x in open_res.closed_ports.split(",")]
+                except:
+                    closedports = []
 
-            # print("\n", time.time()-(time.mktime(t.timetuple()) + t.microsecond/1E6), "\n")
-            openports = list(set(openports)-set(closedports))
-            for port in ports:
-                host_dic = {}
-                if port in openports:
-                    tz = pytz.timezone("Asia/Calcutta")
-                    t = open_res.scanned_on
-                    host_dic["ip"] = host.ip
-                    host_dic["port"] = port
-                    host_dic["issecured"] = 1
-                    host_dic["lastchecked"] = timeconvert(
-                        (tz.localize(datetime.now()) - open_res.scanned_on).total_seconds())
-                    host_dic["insecure"] = 0
-                    host_dic["lastbreach"] = lastBreach(host, port)
-                    print("\n", t, "\n")
-
-                    res[i] = host_dic
-                    i += 1
-                elif port in closedports:
-                    tz = pytz.timezone("Asia/Calcutta")
-                    t = open_res.scanned_on
-                    host_dic["ip"] = host.ip
-                    host_dic["port"] = port
-                    host_dic["issecured"] = 0
-                    host_dic["lastbreach"] = "None"
-                    host_dic["lastchecked"] = timeconvert(
-                        (tz.localize(datetime.now()) - open_res.scanned_on).total_seconds())
-                    host_dic["insecure"] = len(closedports)
-                    res[i] = host_dic
-                    i += 1
+                # print("\n", time.time()-(time.mktime(t.timetuple()) + t.microsecond/1E6), "\n")
+                openports = list(set(openports)-set(closedports))
+                for port in ports:
+                    host_dic = {}
+                    if port in openports:
+                        tz = pytz.timezone("Asia/Calcutta")
+                        t = open_res.scanned_on
+                        host_dic["ip"] = host.ip
+                        host_dic["port"] = port
+                        host_dic["issecured"] = 1
+                        host_dic["lastchecked"] = timeconvert(
+                            (tz.localize(datetime.now()) - open_res.scanned_on).total_seconds())
+                        host_dic["insecure"] = 0
+                        host_dic["lastbreach"] = lastBreach(host, port)
+                        print("\n", t, "\n")
+                        if bool(host_dic):
+                            res[i] = host_dic
+                            i += 1
+                        
+                    elif port in closedports:
+                        tz = pytz.timezone("Asia/Calcutta")
+                        t = open_res.scanned_on
+                        host_dic["ip"] = host.ip
+                        host_dic["port"] = port
+                        host_dic["issecured"] = 0
+                        host_dic["lastbreach"] = "None"
+                        host_dic["lastchecked"] = timeconvert(
+                            (tz.localize(datetime.now()) - open_res.scanned_on).total_seconds())
+                        host_dic["insecure"] = len(closedports)
+                        if bool(host_dic):
+                            res[i] = host_dic
+                            i += 1
 
         except Exception as e:
-            print("\n", e, "\n")
+            print("\n123", e, "\n")
 
     print("\n", res, "\n")
     data = []
@@ -980,57 +1065,77 @@ def add_filters_secured(request):
     for host in hosts:
         try:
             print("\n"*3, host.host_id, "\n")
-            secure_res = SecurePortResult.objects.filter(
-                host=Host.objects.get(host_id=host.host_id)).last()
+            secure_res_all = SecurePortResult.objects.filter(
+                host=Host.objects.get(host_id=host.host_id))
             secure = SecuredPort.objects.filter(
                 host=Host.objects.get(host_id=host.host_id)).last()
             ports = [int(x.strip()) for x in secure.secured_ports.split(",")]
-            try:
-                secureports = [int(x.strip())
-                               for x in secure_res.secure_open_ports.split(",")]
-            except:
-                secureports = []
+            
+            for secure_res in secure_res_all:
+                try:
+                    secureports = [int(x.strip())
+                                for x in secure_res.secure_open_ports.split(",")]
+                except:
+                    secureports = []
 
-            try:
-                unsecureports = [int(x.strip())
-                                 for x in secure_res.unsecure_open_ports.split(",")]
-            except:
-                unsecureports = []
+                try:
+                    unsecureports = [int(x.strip())
+                                    for x in secure_res.unsecure_open_ports.split(",")]
+                except:
+                    unsecureports = []
 
-            # print("\n", time.time()-(time.mktime(t.timetuple()) + t.microsecond/1E6), "\n")
-            secureports = list(set(secureports)-set(unsecureports))
-            for port in ports:
-                host_dic = {}
-                if port in secureports:
-                    tz = pytz.timezone("Asia/Calcutta")
-                    t = secure_res.scanned_on
-                    host_dic["ip"] = host.ip
-                    host_dic["port"] = port
-                    host_dic["issecured"] = 1
-                    host_dic["lastchecked"] = timeconvert(
-                        (tz.localize(datetime.now()) - secure_res.scanned_on).total_seconds())
-                    host_dic["insecure"] = 0
-                    host_dic["lastbreach"] = lastBreach(host, port, True)
-                    print("\n", t, "\n")
+                try:
+                    secureclosedports = [int(x.strip())
+                                        for x in secure_res.secure_closed_ports.split(",")]
+                except:
+                    secureclosedports = []
 
-                    res[i] = host_dic
-                    i += 1
-                elif port in unsecureports:
-                    tz = pytz.timezone("Asia/Calcutta")
-                    t = secure_res.scanned_on
-                    host_dic["ip"] = host.ip
-                    host_dic["port"] = port
-                    host_dic["issecured"] = 0
-                    host_dic["lastbreach"] = "None"
-                    host_dic["lastchecked"] = timeconvert(
-                        (tz.localize(datetime.now()) - secure_res.scanned_on).total_seconds())
-                    host_dic["insecure"] = len(unsecureports)
-                    res[i] = host_dic
-                    i += 1
+                # print("\n", time.time()-(time.mktime(t.timetuple()) + t.microsecond/1E6), "\n")
+                secureports = list(set(secureports)-set(unsecureports))
+                for port in ports:
+                    host_dic = {}
+                    if port in secureports:
+                        tz = pytz.timezone("Asia/Calcutta")
+                        t = secure_res.scanned_on
+                        host_dic["ip"] = host.ip
+                        host_dic["port"] = port
+                        host_dic["issecured"] = 1
+                        host_dic["lastchecked"] = timeconvert(
+                            (tz.localize(datetime.now()) - secure_res.scanned_on).total_seconds())
+                        host_dic["insecure"] = len(unsecureports)
+                        host_dic["lastbreach"] = lastBreach(host, port, True)
+                        res[i] = host_dic
+                        i += 1
+                    elif port in unsecureports:
+                        tz = pytz.timezone("Asia/Calcutta")
+                        t = secure_res.scanned_on
+                        host_dic["ip"] = host.ip
+                        host_dic["port"] = port
+                        host_dic["issecured"] = 0
+                        host_dic["lastbreach"] = "None"
+                        host_dic["lastchecked"] = timeconvert(
+                            (tz.localize(datetime.now()) - secure_res.scanned_on).total_seconds())
+                        host_dic["insecure"] = len(unsecureports)
+                        if bool(host_dic):
+                            res[i] = host_dic
+                            i += 1
+                    elif port in secureclosedports:
+                        tz = pytz.timezone("Asia/Calcutta")
+                        t = secure_res.scanned_on
+                        host_dic["ip"] = host.ip
+                        host_dic["port"] = port
+                        host_dic["issecured"] = 2
+                        host_dic["lastbreach"] = "None"
+                        host_dic["lastchecked"] = timeconvert(
+                            (tz.localize(datetime.now()) - secure_res.scanned_on).total_seconds())
+                        host_dic["insecure"] = len(unsecureports)
+                        if bool(host_dic):
+                            res[i] = host_dic
+                            i += 1
 
         except Exception as e:
             print("\n", e, "\n")
-
+    
     if len(ips) > 0:
         ip_list = [str(x).strip() for x in ips.split(",")]
         res = filter_ip_secured(res, ip_list)
@@ -1140,57 +1245,59 @@ def add_filters_opened(request):
     for host in hosts:
         try:
             print("\n"*3, host.host_id, "\n")
-            open_res = OpenPortResult.objects.filter(
-                host=Host.objects.get(host_id=host.host_id)).last()
+            open_res_all = OpenPortResult.objects.filter(
+                host=Host.objects.get(host_id=host.host_id))
             open1 = OpenPort.objects.filter(
                 host=Host.objects.get(host_id=host.host_id)).last()
             ports = [int(x.strip()) for x in open1.unsecured_ports.split(",")]
-            try:
-                openports = [int(x.strip())
-                             for x in open_res.open_ports.split(",")]
-            except:
-                openports = []
+            for open_res in open_res_all:
+                try:
+                    openports = [int(x.strip())
+                                for x in open_res.open_ports.split(",")]
+                except:
+                    openports = []
 
-            try:
-                closedports = [int(x.strip())
-                               for x in open_res.closed_ports.split(",")]
-            except:
-                closedports = []
+                try:
+                    closedports = [int(x.strip())
+                                for x in open_res.closed_ports.split(",")]
+                except:
+                    closedports = []
 
-            # print("\n", time.time()-(time.mktime(t.timetuple()) + t.microsecond/1E6), "\n")
-            openports = list(set(openports)-set(closedports))
-            for port in ports:
-                host_dic = {}
-                if port in openports:
-                    tz = pytz.timezone("Asia/Calcutta")
-                    t = open_res.scanned_on
-                    host_dic["ip"] = host.ip
-                    host_dic["port"] = port
-                    host_dic["issecured"] = 1
-                    host_dic["lastchecked"] = timeconvert(
-                        (tz.localize(datetime.now()) - open_res.scanned_on).total_seconds())
-                    host_dic["insecure"] = 0
-                    host_dic["lastbreach"] = lastBreach(host, port)
-                    print("\n", t, "\n")
-
-                    res[i] = host_dic
-                    i += 1
-                elif port in closedports:
-                    tz = pytz.timezone("Asia/Calcutta")
-                    t = open_res.scanned_on
-                    host_dic["ip"] = host.ip
-                    host_dic["port"] = port
-                    host_dic["issecured"] = 0
-                    host_dic["lastbreach"] = "None"
-                    host_dic["lastchecked"] = timeconvert(
-                        (tz.localize(datetime.now()) - open_res.scanned_on).total_seconds())
-                    host_dic["insecure"] = len(closedports)
-                    res[i] = host_dic
-                    i += 1
+                # print("\n", time.time()-(time.mktime(t.timetuple()) + t.microsecond/1E6), "\n")
+                openports = list(set(openports)-set(closedports))
+                for port in ports:
+                    host_dic = {}
+                    if port in openports:
+                        tz = pytz.timezone("Asia/Calcutta")
+                        t = open_res.scanned_on
+                        host_dic["ip"] = host.ip
+                        host_dic["port"] = port
+                        host_dic["issecured"] = 1
+                        host_dic["lastchecked"] = timeconvert(
+                            (tz.localize(datetime.now()) - open_res.scanned_on).total_seconds())
+                        host_dic["insecure"] = 0
+                        host_dic["lastbreach"] = lastBreach(host, port)
+                        print("\n", t, "\n")
+                        if bool(host_dic):
+                            res[i] = host_dic
+                            i += 1
+                        
+                    elif port in closedports:
+                        tz = pytz.timezone("Asia/Calcutta")
+                        t = open_res.scanned_on
+                        host_dic["ip"] = host.ip
+                        host_dic["port"] = port
+                        host_dic["issecured"] = 0
+                        host_dic["lastbreach"] = "None"
+                        host_dic["lastchecked"] = timeconvert(
+                            (tz.localize(datetime.now()) - open_res.scanned_on).total_seconds())
+                        host_dic["insecure"] = len(closedports)
+                        if bool(host_dic):
+                            res[i] = host_dic
+                            i += 1
 
         except Exception as e:
-            print("\n", e, "\n")
-
+            print("\n123", e, "\n")
     if len(ips) > 0:
         ip_list = [str(x).strip() for x in ips.split(",")]
         res = filter_ip_opened(res, ip_list)
@@ -1281,3 +1388,92 @@ def insecure_13(res, value, action):
             except:
                 pass
         return dat
+
+
+def add_filters_view_report(request):
+    secured = request.GET.get("secured")
+    insecure = request.GET.get("insecure")
+    opened = request.GET.get("open")
+    inaccessible = request.GET.get("inaccessible")
+
+    host = Host.objects.get(host_id=request.GET.get("host_id"))
+    sec = SecuredPort.objects.get(host=host)
+    op = OpenPort.objects.get(host=host)
+    sec_res = SecurePortResult.objects.filter(host=host).last()
+    op_res = OpenPortResult.objects.filter(host=host).last()
+    if len(sec_res.secure_open_ports) > 0:
+        secure = [int(x.strip()) for x in sec_res.secure_open_ports.split(",")]
+    else:
+        secure = []
+
+    if len(sec_res.unsecure_open_ports) > 0:
+        unsecure = [int(x.strip()) for x in sec_res.unsecure_open_ports.split(",")]
+    else:
+        unsecure = []
+
+    if len(op_res.open_ports) > 0:
+        open = [int(x.strip()) for x in op_res.open_ports.split(",")]
+    else:
+        open = []
+
+    res = {}
+    i = 0
+    if len(sec.secured_ports) > 0:
+        secure_port = [int(x.strip()) for x in sec.secured_ports.split(",")]
+    else:
+        secure_port = []
+    
+    if len(op.unsecured_ports) > 0:
+        open_port = [int(x.strip()) for x in op.unsecured_ports.split(",")]
+    else:
+        open_port = []
+
+    for port in secure_port:
+        dat = {}
+        if port in secure:
+            dat["host"] = host
+            dat["port"] = port
+            dat["status"] = "Secured"
+        elif port in unsecure:
+            dat["host"] = host
+            dat["port"] = port
+            dat["status"] = "Unsecured"
+        else:
+            dat["host"] = host
+            dat["port"] = port
+            dat["status"] = "Inaccessible"
+        res[i] = dat
+        i+=1
+    for port in open_port:
+        dat = {}
+        if port in open:
+            dat["host"] = host
+            dat["port"] = port
+            dat["status"] = "Open"
+        else:
+            dat["host"] = host
+            dat["port"] = port
+            dat["status"] = "Inaccessible"
+        res[i] = dat
+        i+=1
+    
+    res = applyFilters(secured, insecure, opened, inaccessible, res)
+    filters = {"secured":secured,"insecure":insecure,"open":opened,"inaccessible":inaccessible}
+
+    return render(request, "view_report.html" , {"result_filters" : res, "filters": filters,"host_id":request.GET.get("host_id")})
+
+
+def applyFilters(secured, insecure, opened, inaccessible, res):
+    dat = {}
+    for key in res:
+        if secured == 'true' and res[key]['status']== "Secured":
+            dat[key] = res[key]
+        elif insecure == 'true' and res[key]['status']== "Unsecured":
+            dat[key] = res[key]
+        elif opened == 'true' and res[key]['status'] == "Open":
+            dat[key]= res[key]
+        elif inaccessible == 'true' and res[key]['status'] == "Inaccessible":
+            dat[key] = res[key]
+        elif secured == "false" and insecure == "false" and opened == "false" and inaccessible == "false" :
+            dat[key] = res[key]
+    return dat 
