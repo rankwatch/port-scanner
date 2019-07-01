@@ -178,9 +178,17 @@ def fullScanLastHost(username, host_id):
 
 
 @app.task
-def addHostToDB(username, hostip, hostname, provider,
-                secure_ports, open_ports, full_scan_flag,
-                secure_proxy, unsecure_proxy):
+def addHostToDB(
+    username,
+    hostip,
+    hostname,
+    provider,
+    secure_ports,
+    open_ports,
+    full_scan_flag,
+    secure_proxy,
+    unsecure_proxy
+):
 
     user = User.objects.get(username=username)
     host = Host(
@@ -213,14 +221,23 @@ def addHostToDB(username, hostip, hostname, provider,
     sp.save()
     up.save()
 
-    scanLastHost(username)
-    fullScanLastHost(username, host_primary_key)
+    scanLastHost.delay(username)
+    fullScanLastHost.delay(username, host_primary_key)
 
 
 @app.task
-def updateHostinDB(host_id, username, hostip, hostname,
-                   provider, full_scan_flag, secure_ports,
-                   open_ports, secure_proxy, unsecure_proxy):
+def updateHostinDB(
+    host_id,
+    username,
+    hostip,
+    hostname,
+    provider,
+    full_scan_flag,
+    secure_ports,
+    open_ports,
+    secure_proxy,
+    unsecure_proxy
+):
 
     obj, created = Host.objects.update_or_create(
         host_id=host_id,
@@ -250,7 +267,7 @@ def updateHostinDB(host_id, username, hostip, hostname,
         }
     )
 
-    scanLastHost(username, host_id)
+    scanLastHost.delay(username, host_id)
 
 
 @app.task
