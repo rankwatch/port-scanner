@@ -33,21 +33,27 @@
           <tbody>
             {% if result %}
             {% for k, v in result.items %}
-
-            <tr class="table-dark">
+            <tr class="table-primary">
               <th scope="row">{{k}}</th>
               <th scope="row">{{v.ip}}</th>
               <td>{{v.secure_ports}}</td>
               <td>{{v.unsecure_ports}}</td>
               <td>{{v.open_ports}}</td>
               <td>{{v.inaccessible}}</td>
-              <td>{{v.status}}</td>
+              {% if v.status %}
+              <td><span class="oi oi-circle-check"></span></td>
+              {% else %}
+              <td><span class="oi oi-circle-warning"></span></td>
+              {% endif %}
               <td>
-                <a href="javascript:viewReport({{k}})" class="text-white">View Report</a> |
-                <a href="javascript:editHost({{k}})" class="text-white">Edit</a>
+                <a href="javascript:viewReport({{k}})" class="text-white">
+                    <span class="badge badge-pill badge-info">View Report</span>
+                </a>
+                <a href="javascript:editHost({{k}})" class="text-white">
+                    <span class="badge badge-pill badge-danger">Edit Host</span>
+                </a>
               </td>
             </tr>
-
             {% endfor %}
             {% else %}
             {% for k, v in result_filters.items %}

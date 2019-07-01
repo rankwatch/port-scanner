@@ -97,9 +97,46 @@
       </div>
     </div>
     <br><br>
-    <a href="javascript:loadFullScanReport()" class="text-light">
-      View Past Reports <span class="oi oi-chevron-right small"></span>
-    </a>
+    <div class="card col-sm-12">
+      <div class="card-body">
+        <div class="form-group row">
+          <div class="col-12">
+            <h4>Full Scan Report</h4>
+          </div>
+          <div class="col-12">
+            {% if fullScanStatus %}
+            <label for="full_scan_progress" class="row">
+              <div class="col-sm-12">Status: <strong>Finished!</strong></div>
+            </label>
+            <div id="full_scan_progress" class="progress">
+              <div class="progress-bar bg-success" role="progressbar" style="width: 100%">
+              </div>
+            </div>
+            {% else %}
+            <label for="full_scan_progress" class="row">
+              <div class="col-sm-12">Status: <strong>Running!</strong></div>
+            </label>
+            <div id="full_scan_progress" class="progress">
+              <div class="progress-bar bg-success" role="progressbar" style="width: 1%">
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="row d-flex justify-content-between">
+          <div class="col">
+            <p>
+              Scan Started {{fullScanTime}}
+            </p>
+          </div>
+          <div class="col d-flex justify-content-end">
+            <a href="javascript:loadFullScanReport()" class="text-light">
+              View Past Reports <span class="oi oi-chevron-right small"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>

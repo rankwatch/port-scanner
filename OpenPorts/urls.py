@@ -28,5 +28,5 @@ urlpatterns = [
     url(r'^home/add_filters_opened',
         views.add_filters_opened, name="add_filters_opened"),
     url(r'^home/viewReport$', views.viewReport, name="viewReport"),
-    url(r'^home/add_filters_view_report$', views.add_filters_view_report, name="add_filters_view_report"),
+    url(r'^home/add_filters_view_report$', views.add_filters_view_report, name="add_filters_view_report")
 ]

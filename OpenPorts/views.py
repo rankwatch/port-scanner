@@ -286,7 +286,8 @@ def viewReport(request):
         secure = []
 
     if len(sec_res.unsecure_open_ports) > 0:
-        unsecure = [int(x.strip()) for x in sec_res.unsecure_open_ports.split(",")]
+        unsecure = [int(x.strip())
+                    for x in sec_res.unsecure_open_ports.split(",")]
     else:
         unsecure = []
 
@@ -301,7 +302,7 @@ def viewReport(request):
         secure_port = [int(x.strip()) for x in sec.secured_ports.split(",")]
     else:
         secure_port = []
-    
+
     if len(op.unsecured_ports) > 0:
         open_port = [int(x.strip()) for x in op.unsecured_ports.split(",")]
     else:
@@ -322,7 +323,7 @@ def viewReport(request):
             dat["port"] = port
             dat["status"] = "Inaccessible"
         res[i] = dat
-        i+=1
+        i += 1
     for port in open_port:
         dat = {}
         if port in open:
@@ -394,7 +395,13 @@ def deleteHost(request):
     return HttpResponse("Success")
 
 
-def changePeriod(minutes='*', hours='*', day_of_week='*', day_of_month='*', month_of_year='*'):
+def changePeriod(
+    minutes='*',
+    hours='*',
+    day_of_week='*',
+    day_of_month='*',
+    month_of_year='*'
+):
 
     PeriodicTask.objects.filter().delete()
 
@@ -404,6 +411,12 @@ def changePeriod(minutes='*', hours='*', day_of_week='*', day_of_month='*', mont
         day_of_week=day_of_week,
         day_of_month=day_of_month,
         month_of_year=month_of_year
+    )
+
+    PeriodicTask.objects.update_or_create(
+        crontab=schedule,
+        name='Scan_All_Hosts',
+        task='OpenPorts.tasks.scanAllHosts',
     )
 
     PeriodicTask.objects.update_or_create(
@@ -517,27 +530,45 @@ def timeconvert(sec):
 @login_required
 def loadScanReport(request):
     tz = pytz.timezone("Asia/Calcutta")
-    
+
     stat = ScanStatus.objects.filter().last()
+    full_scan_stat = FullScanStatus.objects.filter().last()
+
     try:
         secure_scan_time = timeconvert(
-            (tz.localize(datetime.now()) - stat.secure_scan_started_on).total_seconds())
+            (
+                tz.localize(datetime.now()) - stat.secure_scan_started_on
+            ).total_seconds()
+        )
     except:
         secure_scan_time = 0
 
     try:
         open_scan_time = timeconvert(
-            (tz.localize(datetime.now()) - stat.open_scan_started_on).total_seconds())
+            (
+                tz.localize(datetime.now()) - stat.open_scan_started_on
+            ).total_seconds()
+        )
     except:
         open_scan_time = 0
 
-    
+    try:
+        full_scan_time = timeconvert(
+            (
+                tz.localize(datetime.now()) - full_scan_stat.started_on
+            ).total_seconds()
+        )
+    except:
+        full_scan_time = 0
+
     try:
         context = {
             'secureScanStatus': stat.secure_scan_status,
             'openScanStatus': stat.open_scan_status,
             'secureScanTime': secure_scan_time,
-            'openScanTime': open_scan_time
+            'openScanTime': open_scan_time,
+            'fullScanTime': full_scan_time,
+            'fullScanStatus': full_scan_stat.scan_status
         }
         return render(request, 'scanreport.html', context)
     except:
@@ -564,23 +595,23 @@ def securePortReport(request):
             secure = SecuredPort.objects.filter(
                 host=Host.objects.get(host_id=host.host_id)).last()
             ports = [int(x.strip()) for x in secure.secured_ports.split(",")]
-            
+
             for secure_res in secure_res_all:
                 try:
                     secureports = [int(x.strip())
-                                for x in secure_res.secure_open_ports.split(",")]
+                                   for x in secure_res.secure_open_ports.split(",")]
                 except:
                     secureports = []
 
                 try:
                     unsecureports = [int(x.strip())
-                                    for x in secure_res.unsecure_open_ports.split(",")]
+                                     for x in secure_res.unsecure_open_ports.split(",")]
                 except:
                     unsecureports = []
 
                 try:
                     secureclosedports = [int(x.strip())
-                                        for x in secure_res.secure_closed_ports.split(",")]
+                                         for x in secure_res.secure_closed_ports.split(",")]
                 except:
                     secureclosedports = []
 
@@ -626,7 +657,7 @@ def securePortReport(request):
 
         except Exception as e:
             print("\n", e, "\n")
-    
+
     data = []
     for i in res:
         data.append(res[i])
@@ -653,13 +684,13 @@ def openPortReport(request):
             for open_res in open_res_all:
                 try:
                     openports = [int(x.strip())
-                                for x in open_res.open_ports.split(",")]
+                                 for x in open_res.open_ports.split(",")]
                 except:
                     openports = []
 
                 try:
                     closedports = [int(x.strip())
-                                for x in open_res.closed_ports.split(",")]
+                                   for x in open_res.closed_ports.split(",")]
                 except:
                     closedports = []
 
@@ -681,7 +712,7 @@ def openPortReport(request):
                         if bool(host_dic):
                             res[i] = host_dic
                             i += 1
-                        
+
                     elif port in closedports:
                         tz = pytz.timezone("Asia/Calcutta")
                         t = open_res.scanned_on
@@ -699,7 +730,6 @@ def openPortReport(request):
         except Exception as e:
             print("\n123", e, "\n")
 
-    print("\n", res, "\n")
     data = []
     for i in res:
         data.append(res[i])
@@ -1071,23 +1101,23 @@ def add_filters_secured(request):
             secure = SecuredPort.objects.filter(
                 host=Host.objects.get(host_id=host.host_id)).last()
             ports = [int(x.strip()) for x in secure.secured_ports.split(",")]
-            
+
             for secure_res in secure_res_all:
                 try:
                     secureports = [int(x.strip())
-                                for x in secure_res.secure_open_ports.split(",")]
+                                   for x in secure_res.secure_open_ports.split(",")]
                 except:
                     secureports = []
 
                 try:
                     unsecureports = [int(x.strip())
-                                    for x in secure_res.unsecure_open_ports.split(",")]
+                                     for x in secure_res.unsecure_open_ports.split(",")]
                 except:
                     unsecureports = []
 
                 try:
                     secureclosedports = [int(x.strip())
-                                        for x in secure_res.secure_closed_ports.split(",")]
+                                         for x in secure_res.secure_closed_ports.split(",")]
                 except:
                     secureclosedports = []
 
@@ -1136,7 +1166,7 @@ def add_filters_secured(request):
 
         except Exception as e:
             print("\n", e, "\n")
-    
+
     if len(ips) > 0:
         ip_list = [str(x).strip() for x in ips.split(",")]
         res = filter_ip_secured(res, ip_list)
@@ -1164,8 +1194,8 @@ def add_filters_secured(request):
     for i in res:
         data.append(res[i])
     return render(request, "secure_port_report.html", {"secure_filters": res,
-                                                "filters": filters,
-                                                "csv": str(data)})
+                                                       "filters": filters,
+                                                       "csv": str(data)})
 
 
 def filter_ip_secured(res, ip_list):
@@ -1254,13 +1284,13 @@ def add_filters_opened(request):
             for open_res in open_res_all:
                 try:
                     openports = [int(x.strip())
-                                for x in open_res.open_ports.split(",")]
+                                 for x in open_res.open_ports.split(",")]
                 except:
                     openports = []
 
                 try:
                     closedports = [int(x.strip())
-                                for x in open_res.closed_ports.split(",")]
+                                   for x in open_res.closed_ports.split(",")]
                 except:
                     closedports = []
 
@@ -1282,7 +1312,7 @@ def add_filters_opened(request):
                         if bool(host_dic):
                             res[i] = host_dic
                             i += 1
-                        
+
                     elif port in closedports:
                         tz = pytz.timezone("Asia/Calcutta")
                         t = open_res.scanned_on
@@ -1327,8 +1357,8 @@ def add_filters_opened(request):
     for i in res:
         data.append(res[i])
     return render(request, "open_port_report.html", {"secure_filters": res,
-                                              "filters": filters,
-                                              "csv": str(data)})
+                                                     "filters": filters,
+                                                     "csv": str(data)})
 
 
 def filter_ip_opened(res, ip_list):
@@ -1408,7 +1438,8 @@ def add_filters_view_report(request):
         secure = []
 
     if len(sec_res.unsecure_open_ports) > 0:
-        unsecure = [int(x.strip()) for x in sec_res.unsecure_open_ports.split(",")]
+        unsecure = [int(x.strip())
+                    for x in sec_res.unsecure_open_ports.split(",")]
     else:
         unsecure = []
 
@@ -1423,7 +1454,7 @@ def add_filters_view_report(request):
         secure_port = [int(x.strip()) for x in sec.secured_ports.split(",")]
     else:
         secure_port = []
-    
+
     if len(op.unsecured_ports) > 0:
         open_port = [int(x.strip()) for x in op.unsecured_ports.split(",")]
     else:
@@ -1444,7 +1475,7 @@ def add_filters_view_report(request):
             dat["port"] = port
             dat["status"] = "Inaccessible"
         res[i] = dat
-        i+=1
+        i += 1
     for port in open_port:
         dat = {}
         if port in open:
@@ -1456,8 +1487,8 @@ def add_filters_view_report(request):
             dat["port"] = port
             dat["status"] = "Inaccessible"
         res[i] = dat
-        i+=1
-    
+        i += 1
+
     res = applyFilters(secured, insecure, opened, inaccessible, res)
     filters = {"secured":secured,"insecure":insecure,"open":opened,"inaccessible":inaccessible}
     csv = []
@@ -1469,17 +1500,17 @@ def add_filters_view_report(request):
 def applyFilters(secured, insecure, opened, inaccessible, res):
     dat = {}
     for key in res:
-        if secured == 'true' and res[key]['status']== "Secured":
+        if secured == 'true' and res[key]['status'] == "Secured":
             dat[key] = res[key]
-        elif insecure == 'true' and res[key]['status']== "Unsecured":
+        elif insecure == 'true' and res[key]['status'] == "Unsecured":
             dat[key] = res[key]
         elif opened == 'true' and res[key]['status'] == "Open":
-            dat[key]= res[key]
+            dat[key] = res[key]
         elif inaccessible == 'true' and res[key]['status'] == "Inaccessible":
             dat[key] = res[key]
-        elif secured == "false" and insecure == "false" and opened == "false" and inaccessible == "false" :
+        elif secured == "false" and insecure == "false" and opened == "false" and inaccessible == "false":
             dat[key] = res[key]
-    return dat 
+    return dat
 
 
 @login_required
