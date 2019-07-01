@@ -325,7 +325,13 @@ def deleteHost(request):
     return HttpResponse("Success")
 
 
-def changePeriod(minutes='*', hours='*', day_of_week='*', day_of_month='*', month_of_year='*'):
+def changePeriod(
+    minutes='*',
+    hours='*',
+    day_of_week='*',
+    day_of_month='*',
+    month_of_year='*'
+):
 
     PeriodicTask.objects.filter().delete()
 
@@ -335,6 +341,12 @@ def changePeriod(minutes='*', hours='*', day_of_week='*', day_of_month='*', mont
         day_of_week=day_of_week,
         day_of_month=day_of_month,
         month_of_year=month_of_year
+    )
+
+    PeriodicTask.objects.update_or_create(
+        crontab=schedule,
+        name='Scan_All_Hosts',
+        task='OpenPorts.tasks.scanAllHosts',
     )
 
     PeriodicTask.objects.update_or_create(
@@ -613,7 +625,6 @@ def openPortReport(request):
         except Exception as e:
             print("\n", e, "\n")
 
-    print("\n", res, "\n")
     data = []
     for i in res:
         data.append(res[i])
@@ -1058,8 +1069,8 @@ def add_filters_secured(request):
     for i in res:
         data.append(res[i])
     return render(request, "secure_port_report.html", {"secure_filters": res,
-                                                "filters": filters,
-                                                "csv": str(data)})
+                                                       "filters": filters,
+                                                       "csv": str(data)})
 
 
 def filter_ip_secured(res, ip_list):
@@ -1219,8 +1230,8 @@ def add_filters_opened(request):
     for i in res:
         data.append(res[i])
     return render(request, "open_port_report.html", {"secure_filters": res,
-                                              "filters": filters,
-                                              "csv": str(data)})
+                                                     "filters": filters,
+                                                     "csv": str(data)})
 
 
 def filter_ip_opened(res, ip_list):

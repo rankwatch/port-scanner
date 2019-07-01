@@ -254,7 +254,14 @@ def updateHostinDB(host_id, username, hostip, hostname,
 
 
 @app.task
-def scanSingleHost(user, last_host, last_open_ports, last_secured_ports, last_settings):
+def scanSingleHost(
+    user,
+    last_host,
+    last_open_ports,
+    last_secured_ports,
+    last_settings
+):
+
     ScanStatus().save()
     user = jp.decode(user)
     last_host = jp.decode(last_host)
@@ -366,8 +373,30 @@ def scanSingleUser(user):
 
 
 @app.task
+def fullScanSingleUser(user):
+    user = jp.decode(user)
+    hosts = Host.objects.filter(
+        added_by=User.objects.get(username=user.username))
+
+    for last_host in hosts:
+        if last_host.full_scan_flag:
+            fullScanLastHost.delay(
+                user.username,
+                last_host.id
+            )
+
+
+@app.task
 def scanAllHosts():
     users = User.objects.filter()
 
     for user in users:
         scanSingleUser.delay(jp.encode(user))
+
+
+@app.task
+def fullScanAllHosts():
+    users = User.objects.filter()
+
+    for user in users:
+        fullScanSingleUser.delay(jp.encode(user))
