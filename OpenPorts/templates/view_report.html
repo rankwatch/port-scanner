@@ -71,168 +71,150 @@
             </div>
             {% endif %}
 
-            {% if filters %}
-            <div class="col-sm-3">
-                <form class="p-1">
-                    <fieldset>
-                        <legend class="text-center lead">Filters</legend>
-
-                        {% if filters.secured == "true" %}
-                        <div class="form-group row text-success custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check1" checked>
-                            <label class="custom-control-label" for="check1">Secured Port</label>
-                        </div>
-                        {% else %}
-                        <div class="form-group row text-success custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check1">
-                            <label class="custom-control-label" for="check1">Secured Port</label>
-                        </div>
-                        {% endif %}
-
-                        {% if filters.insecure == "true" %}
-                        <div class="form-group row text-danger custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check2" checked>
-                            <label class="custom-control-label" for="check2">Insecurd Port</label>
-                        </div>
-                        {% else %}
-                        <div class="form-group row text-danger custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check2">
-                            <label class="custom-control-label" for="check2">Insecurd Port</label>
-                        </div>
-                        {% endif %}
-
-                        {% if filters.open == "true" %}
-                        <div class="form-group row text-primary custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check3" checked>
-                            <label class="custom-control-label" for="check3">Open Port</label>
-                        </div>
-                        {% else %}
-                        <div class="form-group row text-primary custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check3">
-                            <label class="custom-control-label" for="check3">Open Port</label>
-                        </div>
-                        {% endif %}
-
-                        {% if filters.inaccessible == "true" %}
-                        <div class="form-group row text-danger custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check4" checked>
-                            <label class="custom-control-label" for="check4">Inaccessible Port</label>
-                        </div>
-                        {% else %}
-                        <div class="form-group row text-danger custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check4">
-                            <label class="custom-control-label" for="check4">Inaccessible Port</label>
-                        </div>
-                        {% endif %}
-
-                        <div class="form-group row d-flex justify-content-center">
-                            <a class="btn btn-primary btn-block" href="javascript:filterResults({{host_id}});">Apply
-                                Filter</a>
-                        </div>
-                        <div class="form-group row d-flex justify-content-center">
-                            <a class="btn btn-primary btn-block"
-                                href="javascript:JSONToCSVConvertor({{csv}}, 'Report', true);">Export to
-                                CSV</a>
-                        </div>
-                    </fieldset>
-                </form>
+            {% if filters.insecure == "true" %}
+            <div class="form-group row text-danger custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check2" checked>
+              <label class="custom-control-label" for="check2">Insecurd Port</label>
             </div>
             {% else %}
-            <div class="col-sm-3">
-                <form class="p-1">
-                    <fieldset>
-                        <legend class="text-center lead">Filters</legend>
-
-                        <div class="form-group row text-success custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check1">
-                            <label class="custom-control-label" for="check1">Secured Port</label>
-                        </div>
-                        <div class="form-group row text-danger custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check2">
-                            <label class="custom-control-label" for="check2">Insecure Port</label>
-                        </div>
-                        <div class="form-group row text-primary custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check3">
-                            <label class="custom-control-label" for="check3">Open Port</label>
-                        </div>
-                        <div class="form-group row text-danger custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check4">
-                            <label class="custom-control-label" for="check4">Inaccessible Port</label>
-                        </div>
-                        <div class="form-group row d-flex justify-content-center">
-                            <a class="btn btn-primary btn-block" href="javascript:filterResults({{host_id}});">Apply
-                                Filter</a>
-                        </div>
-                        <div class="form-group row d-flex justify-content-center">
-                            <a class="btn btn-primary btn-block"
-                                href="javascript:JSONToCSVConvertor({{csv}}, 'Report', true);">Export to
-                                CSV</a>
-                        </div>
-                    </fieldset>
-                </form>
+            <div class="form-group row text-danger custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check2">
+              <label class="custom-control-label" for="check2">Insecurd Port</label>
             </div>
             {% endif %}
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
-    <script>
+            {% if filters.open == "true" %}
+            <div class="form-group row text-primary custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check3" checked>
+              <label class="custom-control-label" for="check3">Open Port</label>
+            </div>
+            {% else %}
+            <div class="form-group row text-primary custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check3">
+              <label class="custom-control-label" for="check3">Open Port</label>
+            </div>
+            {% endif %}
+
+            {% if filters.inaccessible == "true" %}
+            <div class="form-group row text-danger custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check4" checked>
+              <label class="custom-control-label" for="check4">Inaccessible Port</label>
+            </div>
+            {% else %}
+            <div class="form-group row text-danger custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check4">
+              <label class="custom-control-label" for="check4">Inaccessible Port</label>
+            </div>
+            {% endif %}
+
+            <div class="form-group row d-flex justify-content-center">
+              <a class="btn btn-primary btn-block" href="javascript:filterResults({{host_id}});">Apply
+                Filter</a>
+            </div>
+            <div class="form-group row d-flex justify-content-center">
+              <a class="btn btn-primary btn-block" href="javascript:JSONToCSVConvertor({{csv}}, 'Report', true);">Export
+                to
+                CSV</a>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+      {% else %}
+      <div class="col-sm-3">
+        <form class="p-1">
+          <fieldset>
+            <legend class="text-center lead">Filters</legend>
+
+            <div class="form-group row text-success custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check1">
+              <label class="custom-control-label" for="check1">Secured Port</label>
+            </div>
+            <div class="form-group row text-danger custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check2">
+              <label class="custom-control-label" for="check2">Insecure Port</label>
+            </div>
+            <div class="form-group row text-primary custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check3">
+              <label class="custom-control-label" for="check3">Open Port</label>
+            </div>
+            <div class="form-group row text-danger custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="check4">
+              <label class="custom-control-label" for="check4">Inaccessible Port</label>
+            </div>
+            <div class="form-group row d-flex justify-content-center">
+              <a class="btn btn-primary btn-block" href="javascript:filterResults({{host_id}});">Apply
+                Filter</a>
+            </div>
+            <div class="form-group row d-flex justify-content-center">
+              <a class="btn btn-primary btn-block" href="javascript:JSONToCSVConvertor({{csv}}, 'Report', true);">Export
+                to
+                CSV</a>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+      {% endif %}
+
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+      <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+      <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+      <script>
 
         $(document).ready(function () {
-            var table = $('#all_host_table').DataTable({ "scrollX": true });
+          var table = $('#all_host_table').DataTable({ "scrollX": true });
         });
 
 
         function filterResults(host_id) {
-            var secured = "false";
-            var insecure = "false";
-            var open = "false";
-            var inaccessible = "false";
+          var secured = "false";
+          var insecure = "false";
+          var open = "false";
+          var inaccessible = "false";
 
-            if (document.getElementById("check1").checked == true) {
-                secured = 'true';
-            }
-            if (document.getElementById("check2").checked == true) {
-                insecure = 'true';
-            }
-            if (document.getElementById("check3").checked == true) {
-                open = 'true';
-            }
-            if (document.getElementById("check4").checked == true) {
-                inaccessible = 'true';
-            }
-            $.ajax({
-                type: "GET",
-                url: document.URL + "/add_filters_view_report",
-                dataType: 'html',
-                data: {
-                    "inaccessible": inaccessible,
-                    "insecure": insecure,
-                    "secured": secured,
-                    "open": open,
-                    "host_id": host_id
+          if (document.getElementById("check1").checked == true) {
+            secured = 'true';
+          }
+          if (document.getElementById("check2").checked == true) {
+            insecure = 'true';
+          }
+          if (document.getElementById("check3").checked == true) {
+            open = 'true';
+          }
+          if (document.getElementById("check4").checked == true) {
+            inaccessible = 'true';
+          }
+          $.ajax({
+            type: "GET",
+            url: document.URL + "/add_filters_view_report",
+            dataType: 'html',
+            data: {
+              "inaccessible": inaccessible,
+              "insecure": insecure,
+              "secured": secured,
+              "open": open,
+              "host_id": host_id
 
-                },
-                success: function (data) {
-                    if (data) {
-                        console.log(document.URL);
-                        $("#results").html(data);
-                    }
-                    else {
-                        $("#results").html('<div class="container">\
+            },
+            success: function (data) {
+              if (data) {
+                console.log(document.URL);
+                $("#results").html(data);
+              }
+              else {
+                $("#results").html('<div class="container">\
                         <div class="alert alert-danger alert-dismissible">\
                         <button type="button" class="close" data-dismiss="alert">&times;</button>\
                         <strong>Oops!</strong> Something went wrong!\
                         </div></div>');
-          }
+              }
+            }
+          });
         }
-      });
-    }
 
 
-  </script>
+      </script>
 </body>
 
 
