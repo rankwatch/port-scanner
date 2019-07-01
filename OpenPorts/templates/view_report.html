@@ -44,9 +44,9 @@
                         {% for k, v in result_filters.items %}
 
                         <tr class="table-primary">
-                                <td scope="row"><strong>{{v.host}}</strong></td>
-                                <th scope="row">{{v.port}}</th>
-                                <td>{{v.status}}</td>
+                            <td scope="row"><strong>{{v.host}}</strong></td>
+                            <th scope="row">{{v.port}}</th>
+                            <td>{{v.status}}</td>
                         </tr>
 
                         {% endfor %}
@@ -113,6 +113,11 @@
                             <a class="btn btn-primary btn-block" href="javascript:filterResults({{host_id}});">Apply
                                 Filter</a>
                         </div>
+                        <div class="form-group row d-flex justify-content-center">
+                            <a class="btn btn-primary btn-block"
+                                href="javascript:JSONToCSVConvertor({{csv}}, 'Report', true);">Export to
+                                CSV</a>
+                        </div>
                     </fieldset>
                 </form>
             </div>
@@ -142,6 +147,11 @@
                             <a class="btn btn-primary btn-block" href="javascript:filterResults({{host_id}});">Apply
                                 Filter</a>
                         </div>
+                        <div class="form-group row d-flex justify-content-center">
+                            <a class="btn btn-primary btn-block"
+                                href="javascript:JSONToCSVConvertor({{csv}}, 'Report', true);">Export to
+                                CSV</a>
+                        </div>
                     </fieldset>
                 </form>
             </div>
@@ -166,7 +176,7 @@
             var insecure = "false";
             var open = "false";
             var inaccessible = "false";
-            
+
             if (document.getElementById("check1").checked == true) {
                 secured = 'true';
             }
@@ -188,8 +198,8 @@
                     "insecure": insecure,
                     "secured": secured,
                     "open": open,
-                    "host_id":host_id
-                    
+                    "host_id": host_id
+
                 },
                 success: function (data) {
                     if (data) {
