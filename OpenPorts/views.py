@@ -311,15 +311,15 @@ def viewReport(request):
     for port in secure_port:
         dat = {}
         if port in secure:
-            dat["host"] = host
+            dat["host"] = host.ip
             dat["port"] = port
             dat["status"] = "Secured"
         elif port in unsecure:
-            dat["host"] = host
+            dat["host"] = host.ip
             dat["port"] = port
             dat["status"] = "Unsecured"
         else:
-            dat["host"] = host
+            dat["host"] = host.ip
             dat["port"] = port
             dat["status"] = "Inaccessible"
         res[i] = dat
@@ -327,16 +327,20 @@ def viewReport(request):
     for port in open_port:
         dat = {}
         if port in open:
-            dat["host"] = host
+            dat["host"] = host.ip
             dat["port"] = port
             dat["status"] = "Open"
         else:
-            dat["host"] = host
+            dat["host"] = host.ip
             dat["port"] = port
             dat["status"] = "Inaccessible"
         res[i] = dat
-        i += 1
-    return render(request, "view_report.html", {"result": res, "host_id": request.GET.get("host_id")})
+        i+=1
+    csv = []
+    for i in res:
+        csv.append(res[i])
+    return render(request, "view_report.html" , {"result" : res, "host_id":request.GET.get("host_id"), 'csv':str(csv)})
+
 
 
 def signup(request):
@@ -625,8 +629,7 @@ def securePortReport(request):
                             (tz.localize(datetime.now()) - secure_res.scanned_on).total_seconds())
                         host_dic["insecure"] = len(unsecureports)
                         host_dic["lastbreach"] = lastBreach(host, port, True)
-                        res[i] = host_dic
-                        i += 1
+
                     elif port in unsecureports:
                         tz = pytz.timezone("Asia/Calcutta")
                         t = secure_res.scanned_on
@@ -637,8 +640,7 @@ def securePortReport(request):
                         host_dic["lastchecked"] = timeconvert(
                             (tz.localize(datetime.now()) - secure_res.scanned_on).total_seconds())
                         host_dic["insecure"] = len(unsecureports)
-                        res[i] = host_dic
-                        i += 1
+                        
                     elif port in secureclosedports:
                         tz = pytz.timezone("Asia/Calcutta")
                         t = secure_res.scanned_on
@@ -1461,15 +1463,15 @@ def add_filters_view_report(request):
     for port in secure_port:
         dat = {}
         if port in secure:
-            dat["host"] = host
+            dat["host"] = host.ip
             dat["port"] = port
             dat["status"] = "Secured"
         elif port in unsecure:
-            dat["host"] = host
+            dat["host"] = host.ip
             dat["port"] = port
             dat["status"] = "Unsecured"
         else:
-            dat["host"] = host
+            dat["host"] = host.ip
             dat["port"] = port
             dat["status"] = "Inaccessible"
         res[i] = dat
@@ -1477,7 +1479,7 @@ def add_filters_view_report(request):
     for port in open_port:
         dat = {}
         if port in open:
-            dat["host"] = host
+            dat["host"] = host.ip
             dat["port"] = port
             dat["status"] = "Open"
         else:
@@ -1488,10 +1490,11 @@ def add_filters_view_report(request):
         i += 1
 
     res = applyFilters(secured, insecure, opened, inaccessible, res)
-    filters = {"secured": secured, "insecure": insecure,
-               "open": opened, "inaccessible": inaccessible}
-
-    return render(request, "view_report.html", {"result_filters": res, "filters": filters, "host_id": request.GET.get("host_id")})
+    filters = {"secured":secured,"insecure":insecure,"open":opened,"inaccessible":inaccessible}
+    csv = []
+    for i in res:
+        csv.append(res[i])
+    return render(request, "view_report.html" , {"result_filters" : res, "filters": filters,"host_id":request.GET.get("host_id"),'csv':str(csv)})
 
 
 def applyFilters(secured, insecure, opened, inaccessible, res):
@@ -1508,3 +1511,89 @@ def applyFilters(secured, insecure, opened, inaccessible, res):
         elif secured == "false" and insecure == "false" and opened == "false" and inaccessible == "false":
             dat[key] = res[key]
     return dat
+
+
+@login_required
+def fullScanReport(request):
+    hosts = Host.objects.filter(
+                                added_by=User.objects.get(
+                                username=request.user.username))    
+    res = {}
+    tz = pytz.timezone("Asia/Calcutta")
+    i=0
+    try :
+        for host in hosts:
+            dat = {}
+            dat['Host'] = str(host.ip)
+            full_scan = FullScanResult.objects.filter(host = host).last()
+            scanned_on = full_scan.started_on
+            dat['last_scanned_on'] = timeconvert(
+                                (tz.localize(datetime.now()) - scanned_on).total_seconds())
+            i+=1
+            res[i] = dat
+    except:
+        pass
+
+    return render(request, 'full_scan_result.html' , {"result": res})
+
+
+@login_required
+def viewAllScans(request):
+    host = request.GET.get("host")
+    tz = pytz.timezone("Asia/Calcutta")
+    res = {}
+    print("\n"*3,host)
+    try:
+        full_scans = FullScanResult.objects.filter(host = Host.objects.get(ip = str(host)))
+        i = 0
+        for full_scan in full_scans:
+            dat = {}
+            dat['last_scanned_on'] = timeconvert(
+                                (tz.localize(datetime.now()) - full_scan.started_on).total_seconds())
+            dat["Host"] = str(host)
+            dat["id"] = full_scan.scan_id
+            i+=1
+            dat["totaltime"] = full_scan.runtime
+            res[i] = dat
+    except:
+        pass
+    return render(request, 'full_scan_result.html' , {"resultAllScans": res})
+
+
+@login_required
+def viewScan(request):
+    id = request.GET.get("id")
+    print(id)
+    try:
+        scan = FullScanResult.objects.get(scan_id = int(id))
+        res = {}
+        i=1
+        if len(scan.open_ports) > 0:
+            open_ports = [int(x.strip()) for x in scan.open_ports.split(",")]
+        else:
+            open_ports = []
+        if len(scan.close_ports) > 0:
+            close_ports = [int(x.strip()) for x in scan.close_ports.split(",")]
+        else:
+            close_ports = []
+        
+        for port in open_ports:
+            dat = {}
+            dat["ip"] = scan.host.ip
+            dat["port"] = port
+            dat["status"] = "Open Port"
+            res[i] = dat
+            i+=1
+    except:
+        pass
+    csv = []
+    for i in res:
+        csv.append(res[i])
+    if bool(res):
+        return render(request, 'view_scan.html', {'result':res,'csv':str(csv)})
+    else:
+        return HttpResponse( '<div class="container">\
+                            <div class="alert alert-danger alert-dismissible">\
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                            <strong>Oops!</strong> No Open Ports!\
+                            </div></div>')

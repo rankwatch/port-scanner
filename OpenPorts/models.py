@@ -163,7 +163,10 @@ class FullScanResult(models.Model):
 
     open_ports = models.TextField()
     close_ports = models.TextField()
-
+    started_on = models.DateTimeField(
+        default=datetime.now,
+        blank=True
+    )
     runtime = models.CharField(max_length=255)
 
     def publish(self):
