@@ -19,6 +19,9 @@ urlpatterns = [
     url(r'^home/scanreport$', views.loadScanReport, name="loadScanReport"),
     url(r'^home/securePortReport$', views.securePortReport, name="securePortReport"),
     url(r'^home/openPortReport$', views.openPortReport, name="openPortReport"),
+    url(r'^home/fullScanReport$', views.fullScanReport, name="fullScanReport"),
+    url(r'^home/viewAllScans$', views.viewAllScans, name="viewAllScans"),
+    url(r'^home/viewScan$', views.viewScan, name="viewScan"),
     url(r'^home/add_filters$', views.add_filters, name="add_filters"),
     url(r'^home/add_filters_secured',
         views.add_filters_secured, name="add_filters_secured"),
@@ -26,7 +29,4 @@ urlpatterns = [
         views.add_filters_opened, name="add_filters_opened"),
     url(r'^home/viewReport$', views.viewReport, name="viewReport"),
     url(r'^home/add_filters_view_report$', views.add_filters_view_report, name="add_filters_view_report"),
-
-
-        views.add_filters_opened, name="add_filters_opened")
 ]

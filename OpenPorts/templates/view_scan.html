@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>View All Hosts</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+
+</head>
+
+<body>
+  <!-- <div id="viewallhosts"></div> -->
+  <div class="container">
+    <br>
+    <div class="row d-flex justify-content-end" >
+      <div class="form-group d-flex justify-content-center col-sm-3">
+        <a class="btn btn-primary btn-block"
+          href="javascript:JSONToCSVConvertor({{csv}}, 'Full_Scan_Report', true);">Export to CSV</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12">
+        <table class="table table-hover" id="all_host_table" style="width:100%;">
+          <thead>
+            <tr>
+              <th scope="row">Host</th>
+              <th scope="col">Port</th>
+              <th scope="col">Status</th>
+
+
+            </tr>
+          </thead>
+          <tbody>
+            {% if result %}
+            {% for k, v in result.items %}
+
+            <tr class="table-dark">
+              <td scope="row"><strong>{{v.ip}}</strong></td>
+              <th scope="row">{{v.port}}</th>
+              <td>{{v.status}}</td>
+
+
+            </tr>
+
+            {% endfor %}
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+  <script>
+
+    $(document).ready(function () {
+      var table = $('#all_host_table').DataTable({ "scrollX": true });
+    });
+
+    
+  </script>
+</body>
+
+
+</html>
