@@ -399,7 +399,7 @@ def fullScanSingleUser(user):
         if last_host.full_scan_flag:
             fullScanLastHost.delay(
                 user.username,
-                last_host.id
+                last_host.host_id
             )
 
 

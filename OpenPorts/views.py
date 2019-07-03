@@ -419,12 +419,6 @@ def changePeriod(
         task='OpenPorts.tasks.scanAllHosts',
     )
 
-    PeriodicTask.objects.update_or_create(
-        crontab=schedule,
-        name='Scan_All_Hosts',
-        task='OpenPorts.tasks.scanAllHosts',
-    )
-
 
 @login_required
 def loadDashboard(request):
