@@ -174,7 +174,7 @@ def allhosts(request):
             open_res = OpenPortResult.objects.filter(
                 host=Host.objects.get(host_id=host.host_id)).last()
 
-            host_dic["ip"] = host.ip
+            host_dic["ip"] = str(host.ip)
 
             try:
                 if len(secure_res.secure_open_ports) > 0:
@@ -339,8 +339,31 @@ def viewReport(request):
     csv = []
     for i in res:
         csv.append(res[i])
-    return render(request, "view_report.html" , {"result" : res, "host_id":request.GET.get("host_id"), 'csv':str(csv)})
+    return render(request, "view_report.html" , {"result" : res, "host_id":request.GET.get("host_id"), 'csv':str(csv),'host':str(host.ip)})
 
+
+@login_required
+def viewReports(request):
+    ip = request.GET.get("ip")
+    tz = pytz.timezone("Asia/Calcutta")
+    res = {}
+    host = Host.objects.get(ip = str(ip))
+    # print("\n"*3,ip)
+    try:
+        all_reports = SecurePortResult.objects.filter(host = Host.objects.get(ip = str(ip)))
+        i = 0
+        for report in all_reports:
+            dat = {}
+            dat['last_scanned_on'] = timeconvert(
+                                (tz.localize(datetime.now()) - report.scanned_on).total_seconds())
+            dat["Host"] = str(ip)
+            dat["id"] = host.host_id
+            i+=1
+            res[i] = dat
+    except Exception as e:
+        print(e)
+    
+    return render(request, "view_reports.html" , {"result" : res, "host_id":request.GET.get("host_id")})
 
 
 def signup(request):
@@ -1589,11 +1612,4 @@ def viewScan(request):
     csv = []
     for i in res:
         csv.append(res[i])
-    if bool(res):
-        return render(request, 'view_scan.html', {'result':res,'csv':str(csv)})
-    else:
-        return HttpResponse( '<div class="container">\
-                            <div class="alert alert-danger alert-dismissible">\
-                            <button type="button" class="close" data-dismiss="alert">&times;</button>\
-                            <strong>Oops!</strong> No Open Ports!\
-                            </div></div>')
+    return render(request, 'view_scan.html', {'result':res,'csv':str(csv),"host":str(scan.host.ip)})

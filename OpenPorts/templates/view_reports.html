@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>View All Hosts</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+
+</head>
+
+<body>
+  <!-- <div id="viewallhosts"></div> -->
+  <div class="container">
+    <div class="row">
+        <a href="javascript:loadAllHost()" class="text-white" style="margin-left:1%;">
+            <span class="badge badge-pill badge-info">Back</span>
+        </a>
+    </div>
+    <br>
+    <div class="row">
+
+      <div class="col-sm-12">
+        <table class="table table-hover" id="all_host_table" style="width:100%;">
+          <thead>
+            <tr>
+              <th scope="row">Host</th>
+              <th scope="col">Scanned</th>
+              <th scope="col">Action</th>
+
+
+            </tr>
+          </thead>
+          <tbody>
+            {% if result %}
+            {% for k, v in result.items %}
+
+            <tr class="table-primary">
+              <td scope="row"><strong>{{v.Host}}</strong></td>
+              <th scope="row">{{v.last_scanned_on}}</th>
+              <td> <a href="javascript:viewReport({{v.id}})" class="text-white">
+                    <span class="badge badge-pill badge-info">View Report</span>
+                </a></td>
+            </tr>
+
+            {% endfor %}
+            {% else %}
+            {% for k, v in result_filters.items %}
+
+            <tr class="table-primary">
+              <td scope="row"><strong>{{v.Host}}</strong></td>
+              <th scope="row">{{v.port}}</th>
+              <td> <a href="javascript:viewReport({{v.id}})" class="text-white">
+                    <span class="badge badge-pill badge-info">View Report</span>
+                </a></td>
+            </tr>
+
+            {% endfor %}
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+      <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+      <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+      <script>
+
+        $(document).ready(function () {
+          var table = $('#all_host_table').DataTable({ "scrollX": true });
+        });
+
+
+        function filterResults(host_id) {
+          var secured = "false";
+          var insecure = "false";
+          var open = "false";
+          var inaccessible = "false";
+
+          if (document.getElementById("check1").checked == true) {
+            secured = 'true';
+          }
+          if (document.getElementById("check2").checked == true) {
+            insecure = 'true';
+          }
+          if (document.getElementById("check3").checked == true) {
+            open = 'true';
+          }
+          if (document.getElementById("check4").checked == true) {
+            inaccessible = 'true';
+          }
+          $.ajax({
+            type: "GET",
+            url: document.URL + "/add_filters_view_report",
+            dataType: 'html',
+            data: {
+              "inaccessible": inaccessible,
+              "insecure": insecure,
+              "secured": secured,
+              "open": open,
+              "host_id": host_id
+
+            },
+            success: function (data) {
+              if (data) {
+                console.log(document.URL);
+                $("#results").html(data);
+              }
+              else {
+                $("#results").html('<div class="container">\
+                        <div class="alert alert-danger alert-dismissible">\
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                        <strong>Oops!</strong> Something went wrong!\
+                        </div></div>');
+              }
+            }
+          });
+        }
+
+
+      </script>
+</body>
+
+
+</html>

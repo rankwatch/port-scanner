@@ -14,13 +14,19 @@
 <body>
   <!-- <div id="viewallhosts"></div> -->
   <div class="container">
-    <br>
-    <div class="row d-flex justify-content-end" >
-      <div class="form-group d-flex justify-content-center col-sm-3">
-        <a class="btn btn-primary btn-block"
-          href="javascript:JSONToCSVConvertor({{csv}}, 'Full_Scan_Report', true);">Export to CSV</a>
+      <div class="row">
+          <div class="col">
+              <a href="javascript:viewAllScans('{{host}}')" class="text-white" style="margin-left:1%;">
+                <span class="badge badge-pill badge-info">Back</span>
+              </a>
+            </div>
+        <div class="col d-flex justify-content-end" >
+          <div class="form-group d-flex justify-content-center col-sm-6">
+            <a class="btn btn-primary btn-block"
+              href="javascript:JSONToCSVConvertor({{csv}}, 'Full_Scan_Report', true);">Export to CSV</a>
+          </div>
+        </div>
       </div>
-    </div>
     <div class="row">
       <div class="col-sm-12">
         <table class="table table-hover" id="all_host_table" style="width:100%;">
