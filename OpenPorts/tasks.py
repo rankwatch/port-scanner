@@ -222,7 +222,10 @@ def addHostToDB(
     up.save()
 
     scanLastHost.delay(username)
-    fullScanLastHost.delay(username, host_primary_key)
+    if full_scan_flag == 'true':
+        fullScanLastHost.delay(username, host_primary_key)
+    else:
+        pass
 
 
 @app.task

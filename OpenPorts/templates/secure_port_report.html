@@ -17,7 +17,12 @@
 
 <body>
   <div class="container">
-    <br>
+      <div class="row">
+          <a href="javascript:loadScanReport()" class="text-white" style="margin-left:1%;">
+              <span class="badge badge-pill badge-info">Back</span>
+          </a>
+      </div>
+      <br>
     <div class="row">
       <div class="col-sm-9">
         <table class="table table-hover" id="securePortTable" style="width:100%;">
@@ -44,7 +49,7 @@
               {% if v.issecured == 1 %}
               <td><span class="oi oi-circle-check"></span></td>
               {% elif v.issecured == 2 %}
-              <td><span class="oi oi-circle-warning"></span></td>
+              <td><span class="oi oi-warning"></span></td>
               {% else %}
               <td><span class="oi oi-circle-x"></span></td>
               {% endif %}
