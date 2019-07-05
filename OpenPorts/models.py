@@ -70,8 +70,8 @@ class Settings(models.Model):
     threads = models.IntegerField(default=100, blank=True)
     timeout = models.IntegerField(default=1, blank=True)
 
-    schedule = models.CharField(max_length=255)
-    delete_scans_period = models.IntegerField()
+    schedule = models.CharField(max_length=255, blank=True)
+    delete_scans_period = models.IntegerField(blank=True)
 
     def publish(self):
         self.save()

@@ -82,8 +82,12 @@ ASGI_APPLICATION = 'PortScanner.routing.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config['MYSQL']['NAME'],
+        'USER': config['MYSQL']['USER'],
+        'PASSWORD': config['MYSQL']['PASSWORD'],
+        'HOST': config['MYSQL']['HOST'],
+        'PORT': config['MYSQL']['PORT'],
     }
 }
 
@@ -140,9 +144,9 @@ CELERY_TIMEZONE = config["TIMEZONE"]["TIMEZONE"]
 
 # CELERY BEAT
 # Other Celery settings
-CELERY_BEAT_SCHEDULE = {
-    'task-number-one': {
-        'task': 'OpenPorts.tasks.scanAllHosts',
-        'schedule': crontab()
-    }
-}
+# CELERY_BEAT_SCHEDULE = {
+#     'task-number-one': {
+#         'task': 'OpenPorts.tasks.scanAllHosts',
+#         'schedule': crontab()
+#     }
+# }
