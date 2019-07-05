@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 
 import jsonpickle as jp
 import ast
+import pytz
 
 
 @app.task
@@ -402,7 +403,7 @@ def fullScanSingleUser(user):
         if last_host.full_scan_flag:
             fullScanLastHost.delay(
                 user.username,
-                last_host.id
+                last_host.host_id
             )
 
 
@@ -420,3 +421,44 @@ def fullScanAllHosts():
 
     for user in users:
         fullScanSingleUser.delay(jp.encode(user))
+
+
+@app.task
+def deleteOldScans():
+    secure_results = SecurePortResult.objects.filter()
+    open_results = OpenPortResult.objects.filter()
+    scan_stats = ScanStatus.objects.filter()
+    full_scan_stats = FullScanStatus.objects.filter()
+    full_scan_results = FullScanResult.objects.filter()
+
+    for secure_result in secure_results:
+        if deleteScan(secure_result.scanned_on):
+            secure_result.delete()
+
+    for open_result in open_results:
+        if deleteScan(open_result.scanned_on):
+            open_result.delete()
+
+    for scan_stat in scan_stats:
+        if deleteScan(scan_stat.secure_scan_started_on):
+            scan_stat.delete()
+
+    for full_scan_stat in full_scan_stats:
+        if deleteScan(full_scan_stat.started_on):
+            full_scan_stat.delete()
+
+    for full_scan_result in full_scan_results:
+        if deleteScan(full_scan_result.started_on):
+            full_scan_result.delete()
+
+
+def deleteScan(scan_time):
+    config = Settings.objects.filter().last()
+
+    tz = pytz.timezone("Asia/Calcutta")
+    seconds = (tz.localize(datetime.now()) - scan_time).total_seconds()
+
+    if seconds > config.delete_scan_period:
+        return True
+    else:
+        return False
