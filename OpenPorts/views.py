@@ -114,13 +114,17 @@ def add_settings(request):
         threads = str(config.threads)
         timeout = str(config.timeout)
         scanf = str(config.schedule)
+        delete_scan_period = str(config.delete_scan_period)
 
-        return render(request, "settings.html", {"result": {
-            "Secure": secure_proxy,
-            "Unsecure": unsecure_proxy,
-            "threads": threads,
-            "timeout": timeout,
-            "scanfrequency": scanf}
+        return render(request, "settings.html", {
+            "result": {
+                "Secure": secure_proxy,
+                "Unsecure": unsecure_proxy,
+                "threads": threads,
+                "timeout": timeout,
+                "scanfrequency": scanf,
+                "deleteScanPeriod": delete_scan_period
+            }
         })
 
     except:
@@ -134,13 +138,18 @@ def new_settings(request):
     secure_ip_port = secure.split(":")
     unsecure_ip_port = unsecure.split(":")
     scanf = str(request.GET.get("scanfrequency"))
-    s = Settings(secure_proxy_ip=secure_ip_port[0],
-                 unsecure_proxy_ip=unsecure_ip_port[0],
-                 secure_proxy_port=secure_ip_port[1],
-                 unsecure_proxy_port=unsecure_ip_port[1],
-                 threads=request.GET.get("threads"),
-                 timeout=request.GET.get("timeout"),
-                 schedule=request.GET.get("scanfrequency"))
+    delP = int(request.GET.get("deleteScanPeriod"))
+    s = Settings(
+        secure_proxy_ip=secure_ip_port[0],
+        unsecure_proxy_ip=unsecure_ip_port[0],
+        secure_proxy_port=secure_ip_port[1],
+        unsecure_proxy_port=unsecure_ip_port[1],
+        threads=request.GET.get("threads"),
+        timeout=request.GET.get("timeout"),
+        schedule=scanf,
+        delete_scan_period=delP
+    )
+
     s.save()
 
     try:
@@ -358,7 +367,7 @@ def viewReports(request):
                                 (tz.localize(datetime.now()) - report.scanned_on).total_seconds())
             dat["Host"] = str(ip)
             dat["id"] = host.host_id
-            i+=1
+            i += 1
             res[i] = dat
     except Exception as e:
         print(e)
@@ -523,7 +532,6 @@ def loadDashboard(request):
 
 
 def timeconvert(sec):
-    print(sec)
     seconds = int(sec)
     if seconds > 59:
         minutes = int(seconds/60)

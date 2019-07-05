@@ -15,14 +15,25 @@ app.config_from_object('django.conf:settings')
 app.conf.beat_schedule = {
     'Scan_All_Hosts': {
         'task': 'OpenPorts.tasks.scanAllHosts',
-        # 'schedule': crontab(minute="*/"+str(Settings.objects.filter().last().schedule))
-        'schedule': crontab()
+        'schedule': crontab(
+            minute="*/60"
+        )
     },
     'Full_Scan_All_Hosts': {
         'task': 'OpenPorts.tasks.fullScanAllHosts',
-        'schedule': crontab(hour=9,
-                            minute=0,
-                            day_of_week="*")
+        'schedule': crontab(
+            hour=0,
+            minute=0,
+            day_of_week="*"
+        )
+    },
+    'Delete_Scans': {
+        'task': 'OpenPorts.tasks.deleteOldScans',
+        'schedule': crontab(
+            hour=23,
+            minute=0,
+            day_of_week="*"
+        )
     }
 }
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)

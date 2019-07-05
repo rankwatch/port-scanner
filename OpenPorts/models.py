@@ -71,6 +71,7 @@ class Settings(models.Model):
     timeout = models.IntegerField(default=1, blank=True)
 
     schedule = models.CharField(max_length=255)
+    delete_scans_period = models.IntegerField()
 
     def publish(self):
         self.save()
