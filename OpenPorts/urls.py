@@ -18,7 +18,11 @@ urlpatterns = [
     url(r'^home/dashboard$', views.loadDashboard, name="loadDashboard"),
     url(r'^home/scanreport$', views.loadScanReport, name="loadScanReport"),
     url(r'^home/securePortReport$', views.securePortReport, name="securePortReport"),
+    url(r'^home/securePortReports$', views.securePortReports, name="securePortReports"),
+    url(r'^home/secureAllHost$', views.secureAllhost, name="secureAllHost"),
     url(r'^home/openPortReport$', views.openPortReport, name="openPortReport"),
+    url(r'^home/openPortReports$', views.openPortReports, name="openPortReports"),
+    url(r'^home/openAllHost$', views.openAllhost, name="openAllHost"),
     url(r'^home/fullScanReport$', views.fullScanReport, name="fullScanReport"),
     url(r'^home/viewAllScans$', views.viewAllScans, name="viewAllScans"),
     url(r'^home/viewScan$', views.viewScan, name="viewScan"),
@@ -28,5 +32,6 @@ urlpatterns = [
     url(r'^home/add_filters_opened',
         views.add_filters_opened, name="add_filters_opened"),
     url(r'^home/viewReport$', views.viewReport, name="viewReport"),
+    url(r'^home/viewReports$', views.viewReports, name="viewReports"),
     url(r'^home/add_filters_view_report$', views.add_filters_view_report, name="add_filters_view_report")
 ]

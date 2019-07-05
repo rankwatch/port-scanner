@@ -43,14 +43,14 @@
               {% if v.status %}
               <td><span class="oi oi-circle-check"></span></td>
               {% else %}
-              <td><span class="oi oi-circle-warning"></span></td>
+              <td><span class="oi oi-circle-x"></span></td>
               {% endif %}
               <td>
-                <a href="javascript:viewReport({{k}})" class="text-white">
-                    <span class="badge badge-pill badge-info">View Report</span>
+                <a href="javascript:viewReports('{{v.ip}}')" class="text-white">
+                  <span class="badge badge-pill badge-info">View All Reports</span>
                 </a>
                 <a href="javascript:editHost({{k}})" class="text-white">
-                    <span class="badge badge-pill badge-danger">Edit Host</span>
+                  <span class="badge badge-pill badge-danger">Edit Host</span>
                 </a>
               </td>
             </tr>
@@ -65,9 +65,12 @@
               <td>{{v.unsecure_ports}}</td>
               <td>{{v.open_ports}}</td>
               <td>{{v.inaccessible}}</td>
-              <td>{{v.status}}</td>
-              <td>
-                <a href="javascript:viewReport({{k}})" class="text-white">View Report</a> |
+              {% if v.status %}
+              <td><span class="oi oi-circle-check"></span></td>
+              {% else %}
+              <td><span class="oi oi-circle-x"></span></td>
+              {% endif %} <td>
+                <a href="javascript:viewReport('{{v.ip}}')" class="text-white">View All Reports</a> |
                 <a href="javascript:editHost({{k}})" class="text-white">Edit</a>
               </td>
             </tr>
@@ -454,6 +457,28 @@
       });
     };
 
+    function viewReports(ip) {
+
+      $.ajax({
+        type: 'GET',
+        url: document.URL + '/viewReports',
+        data: {
+          'ip': ip
+        },
+        dataType: 'html',
+        success: function (data) {
+          if (data) {
+            $("#results").html(data);
+          } else {
+            $('#results').html('<div class="container">\
+                <div class="alert alert-danger alert-dismissible">\
+                <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                <strong>Alert!</strong> Something went wrong!.\
+                </div></div>');
+          }
+        }
+      });
+    };
     function viewReport(host_id) {
 
       $.ajax({
@@ -468,10 +493,10 @@
             $("#results").html(data);
           } else {
             $('#results').html('<div class="container">\
-                <div class="alert alert-danger alert-dismissible">\
-                <button type="button" class="close" data-dismiss="alert">&times;</button>\
-                <strong>Alert!</strong> Something went wrong!.\
-                </div></div>');
+          <div class="alert alert-danger alert-dismissible">\
+          <button type="button" class="close" data-dismiss="alert">&times;</button>\
+          <strong>Alert!</strong> Something went wrong!.\
+          </div></div>');
           }
         }
       });
