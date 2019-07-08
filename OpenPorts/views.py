@@ -89,12 +89,15 @@ def addnewhost(request):
     else:
         unsecure_proxy = u
 
+    print(request.GET.get('open_ports'))
+    print(request.GET.get('secure_ports'))
+
     addHostToDB.delay(request.user.username,
                       request.GET.get('host_ip'),
                       request.GET.get('hostname'),
                       request.GET.get('provider'),
-                      request.GET.get('secure_ports'),
-                      request.GET.get('open_ports'),
+                      'secure,'+str(request.GET.get('secure_ports'))+',',
+                      'open,'+str(request.GET.get('open_ports'))+',',
                       request.GET.get('full_scan_flag'),
                       secure_proxy,
                       unsecure_proxy)
@@ -114,7 +117,7 @@ def add_settings(request):
         threads = str(config.threads)
         timeout = str(config.timeout)
         scanf = str(config.schedule)
-        delete_scan_period = str(config.delete_scan_period)
+        delete_scans_period = str(config.delete_scans_period/86400)
 
         return render(request, "settings.html", {
             "result": {
@@ -123,7 +126,7 @@ def add_settings(request):
                 "threads": threads,
                 "timeout": timeout,
                 "scanfrequency": scanf,
-                "deleteScanPeriod": delete_scan_period
+                "deleteScansPeriod": delete_scans_period
             }
         })
 
@@ -138,7 +141,7 @@ def new_settings(request):
     secure_ip_port = secure.split(":")
     unsecure_ip_port = unsecure.split(":")
     scanf = str(request.GET.get("scanfrequency"))
-    delP = int(str(request.GET.get("deleteScanPeriod")).split()[0])*86400
+    delP = float(str(request.GET.get("deleteScansPeriod")))*86400
 
     s = Settings(
         secure_proxy_ip=secure_ip_port[0],
@@ -148,7 +151,7 @@ def new_settings(request):
         threads=request.GET.get("threads"),
         timeout=request.GET.get("timeout"),
         schedule=scanf,
-        delete_scan_period=delP
+        delete_scans_period=delP
     )
 
     s.save()
@@ -586,7 +589,12 @@ def loadScanReport(request):
             ).total_seconds()
         )
     except:
-        full_scan_time = 0
+        full_scan_time = " - No Scan Started"
+
+    try:
+        full_scan_status = full_scan_stat.scan_status
+    except:
+        full_scan_status = 1
 
     try:
         context = {
@@ -595,10 +603,11 @@ def loadScanReport(request):
             'secureScanTime': secure_scan_time,
             'openScanTime': open_scan_time,
             'fullScanTime': full_scan_time,
-            'fullScanStatus': full_scan_stat.scan_status
+            'fullScanStatus': full_scan_status
         }
         return render(request, 'scanreport.html', context)
-    except:
+    except Exception as e:
+        print(e)
         return HttpResponse('<div class="container">\
                                 <div class="alert alert-danger alert-dismissible">\
                                 <button type="button" class="close" data-dismiss="alert">&times;</button>\
@@ -1735,3 +1744,7 @@ def lastInaccessible(host, port):
             return time
 
     return time
+
+
+def add_mul_hosts(request):
+    return render(request, 'add_mul_hosts.html', {})

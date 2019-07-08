@@ -207,16 +207,18 @@ def addHostToDB(
         added_by=User.objects.get(username=username)
     ).last().host_id
 
+    secure_ports = ", ".join(secure_ports.split(",")[1:-1])
     sp = SecuredPort(
         added_by=user,
         host=Host.objects.get(host_id=host_primary_key),
-        secured_ports=", ".join(secure_ports.split("::")[1:-1])
+        secured_ports=secure_ports
     )
 
+    open_ports = ", ".join(open_ports.split(",")[1:-1])
     up = OpenPort(
         added_by=user,
         host=Host.objects.get(host_id=host_primary_key),
-        unsecured_ports=", ".join(open_ports.split("::")[1:-1])
+        unsecured_ports=open_ports
     )
 
     sp.save()
@@ -336,7 +338,7 @@ def scanSingleHost(
         secured_ports = [int(x.strip())
                          for x in last_secured_ports.secured_ports.split(",")]
     else:
-        secure_port = []
+        secured_ports = []
 
     mulScan_securedPorts = MultiScan(targets=[last_host.ip],
                                      ports=secured_ports,
@@ -458,7 +460,7 @@ def deleteScan(scan_time):
     tz = pytz.timezone("Asia/Calcutta")
     seconds = (tz.localize(datetime.now()) - scan_time).total_seconds()
 
-    if seconds > config.delete_scan_period:
+    if seconds > config.delete_scans_period:
         return True
     else:
         return False

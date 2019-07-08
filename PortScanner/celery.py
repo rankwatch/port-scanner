@@ -30,8 +30,8 @@ app.conf.beat_schedule = {
     'Delete_Scans': {
         'task': 'OpenPorts.tasks.deleteOldScans',
         'schedule': crontab(
-            hour=23,
-            minute=0,
+            hour="*",
+            minute="*/10",
             day_of_week="*"
         )
     }

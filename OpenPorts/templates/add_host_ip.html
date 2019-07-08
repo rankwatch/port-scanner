@@ -330,11 +330,11 @@
       var i;
 
       for (i = 0; i < secure_ports_list.length; i++) {
-        sp_string = sp_string + secure_ports_list.options[i].text + "::";
+        sp_string = sp_string + secure_ports_list.options[i].text + ",";
       }
 
       for (i = 0; i < open_port_list.length; i++) {
-        op_string = op_string + open_port_list.options[i].text + "::";
+        op_string = op_string + open_port_list.options[i].text + ",";
       }
 
       $.ajax({
@@ -471,11 +471,11 @@
       var i;
 
       for (i = 0; i < secure_ports_list.length; i++) {
-        sp_string = sp_string + secure_ports_list.options[i].text + "::";
+        sp_string = sp_string + secure_ports_list.options[i].text + ",";
       }
 
       for (i = 0; i < open_port_list.length; i++) {
-        op_string = op_string + open_port_list.options[i].text + "::";
+        op_string = op_string + open_port_list.options[i].text + ",";
       }
 
       $.ajax({
