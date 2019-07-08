@@ -63,6 +63,10 @@
               Host</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link text-warning" href="javascript:loadAddMultiHost()"><span class="oi oi-list"></span> Add
+              Multiple Hosts</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="javascript:void(0)"><span class="oi oi-question-mark"></span> Help</a>
           </li>
         </ul>
@@ -187,6 +191,26 @@
           }
         }
 
+      });
+    }
+
+    function loadAddMultiHost() {
+      $.ajax({
+
+        type: 'GET',
+        url: document.URL + '/add_mul_hosts',
+        dataType: 'html',
+        success: function (data) {
+          if (data) {
+            $('#results').html(data);
+          } else {
+            $("#results").html('<div class="container">\
+                <div class="alert alert-danger alert-dismissible">\
+                <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                <strong>Oops!</strong> Something went wrong!\
+                </div></div>');
+          }
+        }
       });
     }
 
@@ -337,28 +361,6 @@
         data: {
           'host': host
         },
-        success: function (data) {
-          if (data) {
-            console.log(document.URL);
-            $("#results").html(data);
-          }
-          else {
-            $("#results").html('<div class="container">\
-                          <div class="alert alert-danger alert-dismissible">\
-                          <button type="button" class="close" data-dismiss="alert">&times;</button>\
-                          <strong>Oops!</strong> Something went wrong!\
-                          </div></div>');
-          }
-        }
-      });
-    };
-
-    function loadFullScanReport() {
-
-      $.ajax({
-        type: "GET",
-        url: document.URL + "/fullScanReport",
-        dataType: 'html',
         success: function (data) {
           if (data) {
             console.log(document.URL);

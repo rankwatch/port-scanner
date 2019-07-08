@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Add Multiple hosts</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="jumbotron">
+      <h1 class="display-3">Add Multiple Hosts</h1>
+      <p class="lead">Upload a csv file here that contains the information of hosts as per the format</p>
+      <hr class="my-4">
+      <p>Browse for your csv file it will be uploaded automatically</p>
+      <p class="lead">
+        <div class="form-group">
+          <div class="input-group mb-3">
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="csv_file">
+              <label class="custom-file-label" for="csv_file">Choose file</label>
+            </div>
+          </div>
+        </div>
+      </p>
+      <label id="progress_label" for="secure_progress">Waiting for upload...</label>
+      <div id="secure_progress" class="progress">
+        <div class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+  <script src="https://www.papaparse.com/resources/js/papaparse.js"></script>
+  <script>
+
+    $(".custom-file-input").on("change", function () {
+      var fileName = $(this).val().split("\\").pop();
+      $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function sendMultiHosts(data) {
+
+      for (i = 0; i < data['length']; i++) {
+        await sleep(1000);
+        $.ajax({
+          type: "GET",
+          url: document.URL + "/addnewhost",
+          data: data[i],
+          dataType: 'html',
+          success: function (data) {
+            if (data) {
+              if (i < data['length']) {
+                $("#progress_label").html("Parsing...");
+              } else {
+                $("#progress_label").html("Finished!");
+              }
+              $('.progress-bar').css(
+                {
+                  'width': ((i / data['length']) * 100).toString() + '%'
+                }
+              );
+            }
+            else {
+              $('#results').html('<div class="container">\
+                                  <div class="alert alert-danger alert-dismissible">\
+                                  <button type="button" class="close" data-dismiss="alert">&times;</button>\
+                                  <strong>Oops!</strong> Something went wrong!.\
+                                  </div></div>');
+            }
+          }
+        });
+      }
+    }
+
+    function handleFileSelect(evt) {
+      var file = evt.target.files[0];
+
+      Papa.parse(file, {
+        header: true,
+        dynamicTyping: true,
+        complete: function (results) {
+          data = results;
+          console.log(data);
+          sendMultiHosts(data['data']);
+        }
+      });
+    }
+
+    $(document).ready(function () {
+      $("#csv_file").change(handleFileSelect);
+    });
+
+  </script>
+
+</body>
+
+</html>

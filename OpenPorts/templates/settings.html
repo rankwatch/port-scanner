@@ -49,7 +49,7 @@
               <input id="scanfrequency" type="text" class="form-control" value={{result.scanfrequency}}>
             </div>
             <div class="form-group row">
-              <label for="deleteScansPeriod">Delete Scans After</label>
+              <label for="deleteScansPeriod">Delete Scans After (days)</label>
               <input id="deleteScansPeriod" type="text" class="form-control" value={{result.deleteScansPeriod}}>
             </div>
             <div class="form-group row">
@@ -93,8 +93,8 @@
               <input id="scanfrequency" type="text" class="form-control" placeholder="m:h:d:dM:MY">
             </div>
             <div class="form-group row">
-              <label for="deleteScansPeriod">Delete Scans After</label>
-              <input id="deleteScansPeriod" type="text" class="form-control" placeholder="E.g. - 2 days/hours/minutes">
+              <label for="deleteScansPeriod">Delete Scans After (days)</label>
+              <input id="deleteScansPeriod" type="text" class="form-control" placeholder="x">
             </div>
             <div class="form-group row">
               <a id="save" class="form-control btn btn-primary btn-block" href="javascript:addNewSettings()">Add
@@ -164,6 +164,7 @@
       var threads = $("#threads").val();
       var timeout = $("#timeout").val();
       var scanfrequency = $("#scanfrequency").val();
+      var deleteScansPeriod = $("#deleteScansPeriod").val();
       if (checkBox.checked == false) {
         alert("Please Select the Secure IP")
         return;
@@ -189,7 +190,8 @@
           'unsecure_proxy': text2,
           'threads': threads,
           'timeout': timeout,
-          'scanfrequency': scanfrequency
+          'scanfrequency': scanfrequency,
+          'deleteScansPeriod': deleteScansPeriod
         },
         dataType: 'html',
         success: function (data) {

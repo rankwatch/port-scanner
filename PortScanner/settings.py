@@ -80,16 +80,25 @@ ASGI_APPLICATION = 'PortScanner.routing.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': config['MYSQL']['NAME'],
-        'USER': config['MYSQL']['USER'],
-        'PASSWORD': config['MYSQL']['PASSWORD'],
-        'HOST': config['MYSQL']['HOST'],
-        'PORT': config['MYSQL']['PORT'],
+try:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': config['MYSQL']['NAME'],
+            'USER': config['MYSQL']['USER'],
+            'PASSWORD': config['MYSQL']['PASSWORD'],
+            'HOST': config['MYSQL']['HOST'],
+            'PORT': config['MYSQL']['PORT'],
+        }
     }
-}
+
+except:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3')
+        }
+    }
 
 
 # Password validation
