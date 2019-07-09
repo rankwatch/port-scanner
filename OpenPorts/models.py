@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 
 
 class Host(models.Model):
-    host_id = models.IntegerField(primary_key=True)
+    host_id = models.AutoField(primary_key=True)
 
     host_name = models.CharField(max_length=255)
     added_by = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -59,7 +59,7 @@ class OpenPort(models.Model):
 
 
 class Settings(models.Model):
-    setting_id = models.IntegerField(primary_key=True)
+    setting_id = models.AutoField(primary_key=True)
 
     secure_proxy_ip = models.GenericIPAddressField()
     unsecure_proxy_ip = models.GenericIPAddressField()
@@ -81,7 +81,7 @@ class Settings(models.Model):
 
 
 class SecurePortResult(models.Model):
-    res_id = models.IntegerField(primary_key=True)
+    res_id = models.AutoField(primary_key=True)
     added_by = models.ForeignKey(User, on_delete=models.CASCADE)
     host = models.ForeignKey(Host, on_delete=models.CASCADE)
 
@@ -104,7 +104,7 @@ class SecurePortResult(models.Model):
 
 
 class OpenPortResult(models.Model):
-    res_id = models.IntegerField(primary_key=True)
+    res_id = models.AutoField(primary_key=True)
     added_by = models.ForeignKey(User, on_delete=models.CASCADE)
     host = models.ForeignKey(Host, on_delete=models.CASCADE)
 
@@ -123,7 +123,7 @@ class OpenPortResult(models.Model):
 
 
 class ScanStatus(models.Model):
-    status_id = models.IntegerField(primary_key=True)
+    status_id = models.AutoField(primary_key=True)
     secure_scan_status = models.BooleanField(default=False, blank=True)
     open_scan_status = models.BooleanField(default=False, blank=True)
 
@@ -140,7 +140,7 @@ class ScanStatus(models.Model):
 
 
 class FullScanStatus(models.Model):
-    status_id = models.IntegerField(primary_key=True)
+    status_id = models.AutoField(primary_key=True)
     scan_status = models.BooleanField(default=False, blank=True)
     started_on = models.DateTimeField(
         default=datetime.now,
@@ -157,7 +157,7 @@ class FullScanStatus(models.Model):
 
 
 class FullScanResult(models.Model):
-    scan_id = models.IntegerField(primary_key=True)
+    scan_id = models.AutoField(primary_key=True)
 
     host = models.ForeignKey(Host, on_delete=models.CASCADE)
     added_by = models.ForeignKey(User, on_delete=models.CASCADE)
